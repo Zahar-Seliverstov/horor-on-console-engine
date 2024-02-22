@@ -218,14 +218,16 @@ public:
 	void createRoom(bool isHorizontal, int startX, int endX, int startY, int endY)
 	{
 		srand(rand());
+		int roomWidth = rand() % (ROOM_MAX_HORIZONTAL - ROOM_MIN_HORIZONTAL + 1) + ROOM_MIN_HORIZONTAL;
+		int roomHeight = rand() % (ROOM_MAX_VERTICAL - ROOM_MIN_VERTICAL + 1) + ROOM_MIN_VERTICAL;
 		if (isHorizontal)
 		{
 			// Генерация случайной позиции для вертикальной стены
-			int verticalWall = startX + ROOM_MIN_HORIZONTAL + rand() % (endX - startX - ROOM_MIN_HORIZONTAL + 1);
+			int verticalWall = startX + roomWidth + rand() % (endX - startX - roomWidth + 1);
 			if (verticalWall % 2 == 0)
 			{ // Только нечетные числа
 				verticalWall++;
-				if (verticalWall >= endX + 1 - ROOM_MIN_HORIZONTAL)
+				if (verticalWall >= endX + 1 - roomWidth)
 					verticalWall -= 2;
 			}
 			// Заполнение пространства вертикальной стеной
@@ -255,11 +257,11 @@ public:
 		else
 		{
 			// Генерация случайной позиции для горизонтальной стены
-			int horizontalWall = startY + ROOM_MIN_VERTICAL + rand() % (endY - startY - ROOM_MIN_VERTICAL + 1);
+			int horizontalWall = startY + roomHeight + rand() % (endY - startY - roomHeight + 1);
 			if (horizontalWall % 2 == 0)
 			{ // Только нечетные числа
 				horizontalWall++;
-				if (horizontalWall >= endY + 1 - ROOM_MIN_VERTICAL)
+				if (horizontalWall >= endY + 1 - roomHeight)
 					horizontalWall -= 2;
 			}
 			// Заполнение пространства горизонтальной стеной
@@ -327,9 +329,11 @@ public:
 	vector<vector<int>> maze;                            // Двумерный вектор для хранения карты подземелья в виде значений
 	wstring mazeString;                                  // Двумерный вектор для хранения карты подземелья в виде строки
 	static constexpr int MAP_SIZE_HORIZONTAL = 70;       // Горизонтальный размер карты
-	static constexpr int MAP_SIZE_VERTICAL = 60;         // Вертикальный размер карты
-	static constexpr int ROOM_MIN_HORIZONTAL = 11;       // Минимальная горизонтальная длина комнаты
-	static constexpr int ROOM_MIN_VERTICAL = 9;          // Минимальная вертикальная высота комнаты
+	static constexpr int MAP_SIZE_VERTICAL = 40;         // Вертикальный размер карты
+	static constexpr int ROOM_MIN_HORIZONTAL = 6;       // Минимальная горизонтальная длина комнаты
+	static constexpr int ROOM_MIN_VERTICAL = 6;          // Минимальная вертикальная высота комнаты
+	static constexpr int ROOM_MAX_HORIZONTAL = 10;       // Максимальная горизонтальная длина комнаты
+	static constexpr int ROOM_MAX_VERTICAL = 10;         // Максимальная вертикальная высота комнаты
 	static constexpr int EXTRA_DOOR_CHANCE = 15;         // Шанс создания дополнительных дверей (%)
 	static constexpr int MIN_LENGTH_FOR_EXTRA_DOOR = 40; // Минимальная длина пути для создания дополнительной двери
 };
@@ -406,19 +410,6 @@ void createMap()
 }
 void getMapSize()
 {
-	/*int line = 0;
-	for (int i = 0; i < map.length(); i++)
-	{
-		if (map[i] == '#')
-			line += 1;
-		else
-		{
-			if (mapWidth <= line)
-				mapWidth = (line - 1);
-			break;
-		}
-	}
-	mapHeight = map.length() / mapWidth;*/
 	mapWidth = maze.MAP_SIZE_HORIZONTAL;
 	mapHeight = maze.MAP_SIZE_VERTICAL;
 }
@@ -659,6 +650,7 @@ bool compareByModule(const pair<double, double>& point1, const pair<double, doub
 int main()
 {
 	setlocale(LC_ALL, "rus");
+	system("chcp1251");
 	srand(time(NULL));
 
 	initialScreensaver();
@@ -797,6 +789,5 @@ int main()
 		outputInfo(player.X, player.Y, player.Hp, player.initialHp);
 		WriteConsoleOutput(console, screen, bufferSize, { 0,0 }, &windowSize);
 	}
-	//playerIsAlive.detach();
 	return 0;
 }
