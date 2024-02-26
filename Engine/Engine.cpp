@@ -16,11 +16,6 @@
 #include <cmath>
 using namespace std;
 
-wstring map;
-wstring globalMap;
-int mapWidth = 0;
-int mapHeight = 0;
-
 HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 COORD bufferSize;
 SMALL_RECT windowSize;
@@ -33,7 +28,6 @@ auto timeFinish = chrono::high_resolution_clock::now();
 double timeInSeconds;
 
 double levelDrawing = 10;
-int ratioSizeScreen = 0;
 double fov = 3.14159f / 3;
 bool gameOver = false;
 bool printMiniMap = false;
@@ -79,48 +73,20 @@ public:
 		}
 	}
 };
-class Player
+class MapInfo
 {
-public:
-	int initialHp;
-	int Hp = 100;
-	double X = 3;
-	double Y = 2;
-	double R = 0;
-	double Speed = 4;
-	float Sensitivity = 5;
-	Player() { initialHp = Hp; }
-
-	void motion()
-	{
-		if (GetAsyncKeyState((unsigned short)'D') & 0x8000) R -= (Sensitivity * 0.75f) * timeInSeconds;
-		if (GetAsyncKeyState((unsigned short)'A') & 0x8000) R += (Sensitivity * 0.75f) * timeInSeconds;
-		if (GetAsyncKeyState((unsigned short)'W') & 0x8000)
-		{
-			X += sinf(R) * Speed * timeInSeconds;
-			Y += cosf(R) * Speed * timeInSeconds;
-			if (map[(int)Y * mapWidth + (int)X] == '#')
-			{
-				X -= sinf(R) * Speed * timeInSeconds;
-				Y -= cosf(R) * Speed * timeInSeconds;
-			}
-		}
-		if (GetAsyncKeyState((unsigned short)'S') & 0x8000)
-		{
-			X -= sinf(R) * Speed * timeInSeconds;
-			Y -= cosf(R) * Speed * timeInSeconds;
-			if (map[(int)Y * mapWidth + (int)X] == '#')
-			{
-				X += sinf(R) * Speed * timeInSeconds;
-				Y += cosf(R) * Speed * timeInSeconds;
-			}
-		}
-	}
-};
-class RecursiveDungeon
-{
-public:
+private:
+	vector<vector<int>> maze;                            // Двумерный вектор для хранения карты подземелья в виде значений
+	wstring mazeString;                                  // Двумерный вектор для хранения карты подземелья в виде строки
+	static constexpr int ROOM_MIN_HORIZONTAL = 6;        // Минимальная горизонтальная длина комнаты
+	static constexpr int ROOM_MIN_VERTICAL = 6;          // Минимальная вертикальная высота комнаты
+	static constexpr int ROOM_MAX_HORIZONTAL = 10;       // Максимальная горизонтальная длина комнаты
+	static constexpr int ROOM_MAX_VERTICAL = 10;         // Максимальная вертикальная высота комнаты
+	static constexpr int EXTRA_DOOR_CHANCE = 15;         // Шанс создания дополнительных дверей (%)
+	static constexpr int MIN_LENGTH_FOR_EXTRA_DOOR = 40; // Минимальная длина пути для создания дополнительной двери
+	// Метод зачем то
 	vector<vector<int>> getIntMaze() { return maze; }
+	// Метод для перевода из масива в wstring
 	wstring getWstringMaze()
 	{
 		for (int y = 0; y < MAP_SIZE_VERTICAL; ++y)
@@ -140,13 +106,6 @@ public:
 		}
 		return mazeString;
 	}
-
-	// Конструктор класса
-	RecursiveDungeon()
-	{
-		maze.resize(MAP_SIZE_VERTICAL, vector<int>(MAP_SIZE_HORIZONTAL, 0));
-	}
-
 	// Метод для создания подземелья
 	void createDungeon()
 	{
@@ -176,8 +135,7 @@ public:
 			}
 		}
 	}
-
-	// Рекурсивный метод для разделения пространства и создания комнат
+	// Рекурсивный метод для разделения пространства
 	void division(int startX, int endX, int startY, int endY)
 	{
 		srand(rand());
@@ -289,7 +247,6 @@ public:
 			division(startX, endX, horizontalWall + 1, endY);
 		}
 	}
-
 	// Метод для создания границ для карты
 	void createBorders()
 	{
@@ -305,7 +262,19 @@ public:
 			maze[i][MAP_SIZE_HORIZONTAL - 1] = 1;  // Правая граница
 		}
 	}
+public:
+	wstring MAP;
+	wstring INITIAL_MAP;
+	static constexpr int MAP_SIZE_HORIZONTAL = 60;       // Горизонтальный размер карты
+	static constexpr int MAP_SIZE_VERTICAL = 60;         // Вертикальный размер карты
+	pair<int, int> startCoordinat;
+	pair<int, int> finishCoordinat;
+	char teleportSkin = '&';
 
+	// Конструктор класса
+	MapInfo() { maze.resize(MAP_SIZE_VERTICAL, vector<int>(MAP_SIZE_HORIZONTAL, 0)); }
+	// Метод для отчищения карты
+	void clearMap() { MAP = INITIAL_MAP; }
 	// Метод для вывода карты подземелья в консоль
 	void printDungeon()
 	{
@@ -326,19 +295,83 @@ public:
 		}
 	}
 
-	vector<vector<int>> maze;                            // Двумерный вектор для хранения карты подземелья в виде значений
-	wstring mazeString;                                  // Двумерный вектор для хранения карты подземелья в виде строки
-	static constexpr int MAP_SIZE_HORIZONTAL = 70;       // Горизонтальный размер карты
-	static constexpr int MAP_SIZE_VERTICAL = 40;         // Вертикальный размер карты
-	static constexpr int ROOM_MIN_HORIZONTAL = 6;       // Минимальная горизонтальная длина комнаты
-	static constexpr int ROOM_MIN_VERTICAL = 6;          // Минимальная вертикальная высота комнаты
-	static constexpr int ROOM_MAX_HORIZONTAL = 10;       // Максимальная горизонтальная длина комнаты
-	static constexpr int ROOM_MAX_VERTICAL = 10;         // Максимальная вертикальная высота комнаты
-	static constexpr int EXTRA_DOOR_CHANCE = 15;         // Шанс создания дополнительных дверей (%)
-	static constexpr int MIN_LENGTH_FOR_EXTRA_DOOR = 40; // Минимальная длина пути для создания дополнительной двери
+	void setStartCoordinat()
+	{
+		while (true)
+		{
+			startCoordinat.first = rand() % (MAP_SIZE_HORIZONTAL - 2) + 1;
+			startCoordinat.second = rand() % (MAP_SIZE_VERTICAL - 2) + 1;
+			if (MAP[startCoordinat.second * MAP_SIZE_HORIZONTAL + startCoordinat.first] != '#'
+				&& (startCoordinat.second < (MAP_SIZE_VERTICAL * 0.10) || startCoordinat.second >(MAP_SIZE_VERTICAL * 0.90))
+				|| (startCoordinat.first < (MAP_SIZE_HORIZONTAL * 0.10) || startCoordinat.first >(MAP_SIZE_HORIZONTAL * 0.90))
+				)
+				return;
+		}
+	}
+	void setFinishCoordinat()
+	{
+		startCoordinat.first = rand() % MAP_SIZE_HORIZONTAL + 1;
+		startCoordinat.second = rand() % MAP_SIZE_VERTICAL + 1;
+		if (MAP[startCoordinat.second * MAP_SIZE_VERTICAL + startCoordinat.first] != '#')
+		{
+			return;
+		}
+	}
+	// Создание карты
+	void createMap()
+	{
+		createDungeon();
+		createBorders();
+		MAP = getWstringMaze();
+		setStartCoordinat();
+		MAP[startCoordinat.second * MAP_SIZE_HORIZONTAL + startCoordinat.first] = teleportSkin;
+		INITIAL_MAP = MAP;
+	}
+};
+class Player
+{
+public:
+	int initialHp;
+	int Hp = 100;
+	double X;
+	double Y;
+	double R = 0;
+	double Speed = 4;
+	float Sensitivity = 5;
+	Player(int _X, int _Y)
+	{
+		X = _X;
+		Y = _Y;
+		initialHp = Hp;
+	}
+
+	void motion(MapInfo& mapInfo)
+	{
+		if (GetAsyncKeyState((unsigned short)'D') & 0x8000) R -= (Sensitivity * 0.75f) * timeInSeconds;
+		if (GetAsyncKeyState((unsigned short)'A') & 0x8000) R += (Sensitivity * 0.75f) * timeInSeconds;
+		if (GetAsyncKeyState((unsigned short)'W') & 0x8000)
+		{
+			X += sinf(R) * Speed * timeInSeconds;
+			Y += cosf(R) * Speed * timeInSeconds;
+			if (mapInfo.MAP[(int)Y * mapInfo.MAP_SIZE_HORIZONTAL + (int)X] == '#')
+			{
+				X -= sinf(R) * Speed * timeInSeconds;
+				Y -= cosf(R) * Speed * timeInSeconds;
+			}
+		}
+		if (GetAsyncKeyState((unsigned short)'S') & 0x8000)
+		{
+			X -= sinf(R) * Speed * timeInSeconds;
+			Y -= cosf(R) * Speed * timeInSeconds;
+			if (mapInfo.MAP[(int)Y * mapInfo.MAP_SIZE_HORIZONTAL + (int)X] == '#')
+			{
+				X += sinf(R) * Speed * timeInSeconds;
+				Y += cosf(R) * Speed * timeInSeconds;
+			}
+		}
+	}
 };
 
-RecursiveDungeon maze;
 
 void initialScreensaver()
 {
@@ -373,7 +406,8 @@ void initialScreensaver()
 	system("pause");
 }
 
-void getConsoleSize() {
+void getConsoleSize()
+{
 	HANDLE hWndConsole;
 	if (hWndConsole = GetStdHandle(-12))
 	{
@@ -386,10 +420,10 @@ void getConsoleSize() {
 		}
 	}
 }
-void setConsoleSize()
+void setScreenSize()
 {
-	bufferSize = { short(screenWidth + ratioSizeScreen), short(screenHeight + ratioSizeScreen * 0.5) };
-	windowSize = { 0, 0, short(screenWidth + ratioSizeScreen - 1), short(screenHeight + ratioSizeScreen * 0.5 - 1) };
+	bufferSize = { short(screenWidth), short(screenHeight) };
+	windowSize = { 0, 0, short(screenWidth - 1), short(screenHeight - 1) };
 	SetConsoleScreenBufferSize(console, bufferSize);
 	SetConsoleWindowInfo(console, TRUE, &windowSize);
 }
@@ -401,37 +435,25 @@ void cursoreVisibleFalse()
 	SetConsoleCursorInfo(console, &cursorInfo);
 }
 
-void createMap()
-{
-	maze.createDungeon();
-	maze.createBorders();
-	map = maze.getWstringMaze();
-	globalMap = map;
-}
-void getMapSize()
-{
-	mapWidth = maze.MAP_SIZE_HORIZONTAL;
-	mapHeight = maze.MAP_SIZE_VERTICAL;
-}
-
-void outputInfo(double& playerX, double& playerY, int& playerHp, int& initialHp)
+void outputInfo(Player& player, MapInfo& mapInfo)
 {
 	std::wstringstream stream;
 	stream << L" [ FPS: " << int(1 / timeInSeconds)
-		<< L" ] [ X: " << std::fixed << std::setprecision(2) << playerX
-		<< L" ] [ Y: " << std::fixed << std::setprecision(2) << playerY << L" ] ";
-	wstring FPSString = stream.str();
+		<< L" ] [ X: " << std::fixed << std::setprecision(2) << player.X
+		<< L" ] [ Y: " << std::fixed << std::setprecision(2) << player.Y
+		<< L" ] ";
+	wstring fpsString = stream.str();
 	wstring miniMap = L" ~ MAP ~ ";
 	wstring hpTexture = L"";
 	wstring hp = L" ~ HP ~ ";
-	for (int i = 0; i <= initialHp; i += initialHp / 10)
+	for (int i = 0; i <= player.initialHp; i += player.initialHp / 10)
 	{
-		if (i <= playerHp) hpTexture += L" [\u2665]";
+		if (i <= player.Hp) hpTexture += L" [\u2665]";
 		else hpTexture += L" [X]";
 	}
-	for (int i = 0; i < FPSString.size(); ++i)
+	for (int i = 0; i < fpsString.size(); ++i)
 	{
-		screen[i].Char.UnicodeChar = FPSString[i];
+		screen[i].Char.UnicodeChar = fpsString[i];
 		screen[i].Attributes = 11;
 	}
 	for (int i = 0; i < hp.length(); i++)
@@ -450,17 +472,20 @@ void outputInfo(double& playerX, double& playerY, int& playerHp, int& initialHp)
 		for (int i = 0; i < miniMap.size(); ++i)
 		{
 			screen[i + screenWidth * 2].Char.UnicodeChar = miniMap[i];
-			screen[i + screenWidth * 2].Attributes = 15;
+			screen[i + screenWidth * 2].Attributes = 7;
 		}
-		for (int x = 0; x < mapWidth; x++)
-			for (int y = 0; y < mapHeight; y++)
+		for (int x = 0; x < mapInfo.MAP_SIZE_HORIZONTAL; x++)
+			for (int y = 0; y < mapInfo.MAP_SIZE_VERTICAL; y++)
 			{
-				int index = (y * mapWidth) + x;
-				screen[(y + 3) * screenWidth + x].Char.UnicodeChar = map[index];
-				screen[(y + 3) * screenWidth + x].Attributes = 8;
+				int index = (y * mapInfo.MAP_SIZE_HORIZONTAL) + x;
+				screen[(y + 3) * screenWidth + x].Char.UnicodeChar = mapInfo.MAP[index];
+				screen[(y + 3) * screenWidth + x].Attributes = 15;
 			}
-		screen[((int)playerY + 3) * screenWidth + (int)playerX].Char.UnicodeChar = 'P';
-		screen[((int)playerY + 3) * screenWidth + (int)playerX].Attributes = 10;
+		screen[((int)player.Y + 3) * screenWidth + (int)player.X].Char.UnicodeChar = L'☺';
+		screen[((int)player.Y + 3) * screenWidth + (int)player.X].Attributes = 10;
+		screen[(mapInfo.startCoordinat.second + 3) * screenWidth + (mapInfo.startCoordinat.first)].Char.UnicodeChar = '&';
+		screen[(mapInfo.startCoordinat.second + 3) * screenWidth + (mapInfo.startCoordinat.first)].Attributes = 5;
+
 	}
 }
 void settings(float& playerSensitivity, double& playerSpeed)
@@ -479,7 +504,7 @@ void settings(float& playerSensitivity, double& playerSpeed)
 	system("cls");
 	while (treker)
 	{
-		printf("\x1b[H\x1b[0m\t~ Меню настроек ~\n_______________________________\n\n\x1b[90m\x1b[48;5;0m");
+		printf("\x1b[H\x1b[0m\t~ Меню настроек ~\n_______________________________\n\n\x1b[90m\x1b[48; 5; 0m");
 		for (int i = 0; i < items.size(); i++)
 		{
 			if (i == command)
@@ -609,29 +634,23 @@ void settings(float& playerSensitivity, double& playerSpeed)
 		while (treker)
 		{
 			system("cls");
-			printf("\x1b[0m\t~ Настройки экрана ~\n_________________________________________________\n\n\x1b[0m");
-			for (int i = 0; i <= ratioSizeScreen; i += 10)
-			{
-				printf("\x1b[92m");
-
-				cout << "[" << i << "]";
-
-			}
-			printf("\x1b[90m\n\n {A} <-+-> {D}\n\n\n <= {esc}");
-
-			switch (_getwch())
-			{
-			case arrowLeft: ratioSizeScreen = ratioSizeScreen - 10 >= 0 ? ratioSizeScreen -= 10 : 30;
-				break;
-			case arrowRight: ratioSizeScreen = ratioSizeScreen + 10 <= 30 ? ratioSizeScreen += 10 : 0;
-				break;
-			case escape: treker = false;
-				break;
-			}
-			setConsoleSize();
 			getConsoleSize();
-			screen = new CHAR_INFO[screenWidth * screenHeight];
+			printf("\x1b[0m\t~ Настройки экрана ~\n_________________________________________\n\n\x1b[91m  < Растените окно до нужного размера >\x1b[90m\n\n  Размер окна: \x1b[0m");
+
+			cout << screenWidth << " x " << screenHeight;
+			printf("\x1b[90m\n\n\n  <= {esc}");
+			if (_kbhit())
+			{
+				switch (_getch())
+				{
+				case escape: treker = false;
+				}
+			}
+			this_thread::sleep_for(chrono::milliseconds(200));
 		}
+		setScreenSize();
+		delete[] screen, screen = nullptr;
+		screen = new CHAR_INFO[screenWidth * screenHeight];
 		break;
 	case 5:
 		return;
@@ -650,35 +669,37 @@ bool compareByModule(const pair<double, double>& point1, const pair<double, doub
 int main()
 {
 	setlocale(LC_ALL, "rus");
-	system("chcp1251");
 	srand(time(NULL));
 
-	initialScreensaver();
-	createMap();
-	getMapSize();
-	getConsoleSize();
-	cursoreVisibleFalse();
-	setConsoleSize();
+	MapInfo mapInfo;
+	mapInfo.createMap();
+	Player player(mapInfo.startCoordinat.first, mapInfo.startCoordinat.second);
 
-	Player player;
+	cursoreVisibleFalse();
+	initialScreensaver();
+	getConsoleSize();
+	setScreenSize();
+
 	screen = new CHAR_INFO[screenWidth * screenHeight];
 
 	while (!gameOver)
 	{
-		map = globalMap;
+		mapInfo.clearMap();
 		timeFinish = chrono::high_resolution_clock::now();
 		timeInSeconds = chrono::duration<double>(timeFinish - timeStart).count();
 		timeStart = chrono::high_resolution_clock::now();
-		player.motion();
+		player.motion(mapInfo);
 		if (_kbhit())
 		{
 			switch (_getwch())
 			{
-			case 109: printMiniMap = printMiniMap ? false : true;
+			case 109:
+				if (mapInfo.MAP_SIZE_VERTICAL < screenHeight && mapInfo.MAP_SIZE_HORIZONTAL < screenWidth) { printMiniMap = printMiniMap ? false : true; }
 				break;
 			case 27: settings(player.Sensitivity, player.Speed);
 				break;
 			}
+			cursoreVisibleFalse();
 		}
 		for (int x = 0; x < screenWidth; x++)
 		{
@@ -687,6 +708,8 @@ int main()
 			double rayY = cosf(rayAngle);
 			double distanceWall = 0;
 			bool itWall = false;
+			bool itTeleport = false;
+			bool itMonster = false;
 			bool itBound = false;
 
 			while (!itWall && distanceWall < levelDrawing)
@@ -695,12 +718,13 @@ int main()
 				int testX = (int)(player.X + rayX * distanceWall);
 				int testY = (int)(player.Y + rayY * distanceWall);
 
-				if (testX < 0 || testX >= mapWidth || testY < 0 || testY >= mapHeight)
+				if (testX < 0 || testX >= mapInfo.MAP_SIZE_HORIZONTAL || testY < 0 || testY >= mapInfo.MAP_SIZE_VERTICAL)
 				{
 					itWall = true;
 					distanceWall = levelDrawing;
 				}
-				else if (map[testY * mapWidth + testX] == L'#')
+				else if (mapInfo.MAP[testY * mapInfo.MAP_SIZE_HORIZONTAL + testX] == L'&') { itTeleport = true; }
+				else if (mapInfo.MAP[testY * mapInfo.MAP_SIZE_HORIZONTAL + testX] == L'#')
 				{
 					itWall = true;
 					vector<pair<double, double>> boundsVector;
@@ -716,10 +740,13 @@ int main()
 						}
 					}
 					sort(boundsVector.begin(), boundsVector.end(), compareByModule);
-					double boundAngle = 0.05 / distanceWall;
-					if (acos(boundsVector[0].second) < boundAngle || acos(boundsVector[1].second) < boundAngle) { itBound = true; }
+					double boundAngle = 0.03 / distanceWall;
+					if ((acos(boundsVector[0].second) < boundAngle && distanceWall > 0.5)
+						|| (acos(boundsVector[1].second) < boundAngle && distanceWall > 0.5)) {
+						itBound = true;
+					}
 				}
-				else { map[testY * mapWidth + testX] = '.'; }
+				else { mapInfo.MAP[testY * mapInfo.MAP_SIZE_HORIZONTAL + testX] = '.'; }
 			}
 
 			int celling = (float)(screenHeight / 2.0) - screenHeight / ((float)distanceWall);
@@ -729,7 +756,13 @@ int main()
 			{
 				double centerScreen = 1 - double(y - screenHeight / 2) / (screenHeight / 2);
 
-				if (y <= celling)
+				if (itTeleport && y <= (screenHeight / 2) + 6 - distanceWall * 0.5 && y >= (screenHeight / 2) - 6 + distanceWall * 0.5)
+				{
+					short teleportTexture;
+					screen[y * screenWidth + x].Char.UnicodeChar = '*';
+					screen[y * screenWidth + x].Attributes = 3;
+				}
+				else if (y <= celling)
 				{
 					char cellingTexture;
 
@@ -750,16 +783,17 @@ int main()
 				else if (y > celling && y <= floor)
 				{
 					short wallTexture;
+
 					if (itBound)
 						wallTexture = '|';
 					else if (distanceWall <= levelDrawing / 4)
-						wallTexture = 0x2588;
+						wallTexture = L'█';
 					else if (distanceWall <= levelDrawing / 3)
-						wallTexture = 0x2593;
+						wallTexture = L'▓';
 					else if (distanceWall <= levelDrawing / 2)
-						wallTexture = 0x2592;
+						wallTexture = L'▒';
 					else if (distanceWall <= levelDrawing / 1)
-						wallTexture = 0x2591;
+						wallTexture = L'░';
 					else
 						wallTexture = ' ';
 
@@ -782,11 +816,11 @@ int main()
 						floorTexture = ' ';
 
 					screen[y * screenWidth + x].Char.UnicodeChar = floorTexture;
-					screen[y * screenWidth + x].Attributes = 7;
+					screen[y * screenWidth + x].Attributes = 8;
 				}
 			}
 		}
-		outputInfo(player.X, player.Y, player.Hp, player.initialHp);
+		outputInfo(player, mapInfo);
 		WriteConsoleOutput(console, screen, bufferSize, { 0,0 }, &windowSize);
 	}
 	return 0;
