@@ -1,21 +1,10 @@
-﻿#include <iostream>
-#include <string>
-#include <cmath>
-#include <conio.h>
-#include <Windows.h>
-#include <chrono>
-#include <thread>
-#include <cwchar>
-#include <vector>
-#include <algorithm>
-#include <ctime>
-#include <future>
-#include <algorithm>
-#include <iomanip>
-#include <sstream>
-#include <cmath>
-using namespace std;
+﻿#include "Library.h"
+#include "IMapInfo.h"
+#include "IPlayer.h"
+#include "IEngine.h"
 
+MapInfo mapInfo;
+Player player;
 HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 COORD bufferSize;
 SMALL_RECT windowSize;
@@ -30,7 +19,7 @@ double timeInSeconds;
 double levelDrawing = 10;
 double fov = 3.14159f / 3;
 bool gameOver = false;
-bool printMiniMap = false;
+bool printMinimap = false;
 
 enum Keys
 {
@@ -44,336 +33,6 @@ enum Keys
 	keyD = 100,
 	keyW = 119,
 	keyS = 115
-};
-class Monster
-{
-public:
-	int x = 4, y = 4;
-	int hp = 10;
-
-	void movement(std::wstring& map, int& mapWidth)
-	{
-		int motion = rand() % 4 + 1;
-		int index;
-
-		switch (motion)
-		{
-		case 1:
-			map[y * mapWidth + x + 1] != L'#' ? x += 1 : x;
-			break;
-		case 2:
-			map[y * mapWidth + x - 1] != L'#' ? x -= 1 : x;
-			break;
-		case 3:
-			map[(y - 1) * mapWidth + x] != L'#' ? y -= 1 : y;
-			break;
-		case 4:
-			map[(y + 1) * mapWidth + x] != L'#' ? y += 1 : y;
-			break;
-		}
-	}
-};
-class MapInfo
-{
-private:
-	vector<vector<int>> maze;                            // Двумерный вектор для хранения карты подземелья в виде значений
-	wstring mazeString;                                  // Двумерный вектор для хранения карты подземелья в виде строки
-	static constexpr int ROOM_MIN_HORIZONTAL = 6;        // Минимальная горизонтальная длина комнаты
-	static constexpr int ROOM_MIN_VERTICAL = 6;          // Минимальная вертикальная высота комнаты
-	static constexpr int ROOM_MAX_HORIZONTAL = 10;       // Максимальная горизонтальная длина комнаты
-	static constexpr int ROOM_MAX_VERTICAL = 10;         // Максимальная вертикальная высота комнаты
-	static constexpr int EXTRA_DOOR_CHANCE = 15;         // Шанс создания дополнительных дверей (%)
-	static constexpr int MIN_LENGTH_FOR_EXTRA_DOOR = 40; // Минимальная длина пути для создания дополнительной двери
-	
-	// Метод для создания подземелья
-	void createDungeon()
-	{
-		bool dungeonCreated = false;
-		while (!dungeonCreated)
-		{
-			maze.clear();
-			maze.resize(MAP_SIZE_VERTICAL, vector<int>(MAP_SIZE_HORIZONTAL, 0));
-
-			division(1, MAP_SIZE_HORIZONTAL - 2, 1, MAP_SIZE_VERTICAL - 2); // Создание подземелья
-
-			dungeonCreated = false; // Предполагаем, что подземелье создано
-
-			// Проверка, было ли создано подземелье (если в карте отсутствуют стены)
-			for (int y = 0; y < MAP_SIZE_VERTICAL; ++y)
-			{
-				for (int x = 0; x < MAP_SIZE_HORIZONTAL; ++x)
-				{
-					if (maze[y][x] == 1)
-					{
-						dungeonCreated = true; // Если найдены стены, то подземелье создано
-						break;
-					}
-				}
-				if (dungeonCreated)
-					break;
-			}
-		}
-	}
-	// Рекурсивный метод для разделения пространства
-	void division(int startX, int endX, int startY, int endY)
-	{
-		srand(rand());
-		// Условие выхода из рекурсии: прекращаем разделение, если размер пространства меньше чем размеры минимальной комнаты
-		if (endX - startX + 1 < ROOM_MIN_HORIZONTAL * 2 && endY - startY + 1 < ROOM_MIN_VERTICAL * 2)
-			return;
-
-		// Определение направления разделения на основе размеров пространства
-		if (endX - startX > endY - startY)
-		{
-			if (endX - startX + 1 < ROOM_MIN_HORIZONTAL * 2)
-				return;
-			createRoom(true, startX, endX, startY, endY); // Создание горизонтальной комнаты
-		}
-		else if (endX - startX < endY - startY)
-		{
-			if (endY - startY + 1 < ROOM_MIN_VERTICAL * 2)
-				return;
-			createRoom(false, startX, endX, startY, endY); // Создание вертикальной комнаты
-		}
-		else
-		{
-			if (rand() % 2 == 0)
-			{
-				if (endX - startX + 1 < ROOM_MIN_HORIZONTAL * 2)
-					return;
-				createRoom(true, startX, endX, startY, endY); // Создание горизонтальной комнаты
-			}
-			else
-			{
-				if (endY - startY + 1 < ROOM_MIN_VERTICAL * 2)
-					return;
-				createRoom(false, startX, endX, startY, endY); // Создание вертикальной комнаты
-			}
-		}
-	}
-	// Метод для создания комнаты
-	void createRoom(bool isHorizontal, int startX, int endX, int startY, int endY)
-	{
-		srand(rand());
-		int roomWidth = rand() % (ROOM_MAX_HORIZONTAL - ROOM_MIN_HORIZONTAL + 1) + ROOM_MIN_HORIZONTAL;
-		int roomHeight = rand() % (ROOM_MAX_VERTICAL - ROOM_MIN_VERTICAL + 1) + ROOM_MIN_VERTICAL;
-		if (isHorizontal)
-		{
-			// Генерация случайной позиции для вертикальной стены
-			int verticalWall = startX + roomWidth + rand() % (endX - startX - roomWidth + 1);
-			if (verticalWall % 2 == 0)
-			{ // Только нечетные числа
-				verticalWall++;
-				if (verticalWall >= endX + 1 - roomWidth)
-					verticalWall -= 2;
-			}
-			// Заполнение пространства вертикальной стеной
-			for (int i = startY; i <= endY; ++i)
-			{
-				maze[i][verticalWall] = 1;
-			}
-			// Добавление дополнительных дверей
-			int doorNumbers = 1;
-			if (EXTRA_DOOR_CHANCE > rand() % 100 && endY - startY >= MIN_LENGTH_FOR_EXTRA_DOOR)
-				doorNumbers++;
-			for (int i = 0; i < doorNumbers; ++i)
-			{
-				int randomDoor = startY + rand() % (endY - startY + 1);
-				if (randomDoor % 2 != 0)
-				{
-					randomDoor++;
-					if (randomDoor > endY)
-						randomDoor -= 2;
-				}
-				maze[randomDoor][verticalWall] = 2; // Пометка двери
-			}
-			// Рекурсивное разделение пространства слева и справа от стены
-			division(startX, verticalWall - 1, startY, endY);
-			division(verticalWall + 1, endX, startY, endY);
-		}
-		else
-		{
-			// Генерация случайной позиции для горизонтальной стены
-			int horizontalWall = startY + roomHeight + rand() % (endY - startY - roomHeight + 1);
-			if (horizontalWall % 2 == 0)
-			{ // Только нечетные числа
-				horizontalWall++;
-				if (horizontalWall >= endY + 1 - roomHeight)
-					horizontalWall -= 2;
-			}
-			// Заполнение пространства горизонтальной стеной
-			for (int i = startX; i <= endX; ++i)
-			{
-				maze[horizontalWall][i] = 1;
-			}
-			// Добавление дополнительных дверей
-			int doorNumbers = 1;
-			if (EXTRA_DOOR_CHANCE > rand() % 100 && endX - startX >= MIN_LENGTH_FOR_EXTRA_DOOR)
-				doorNumbers++;
-			for (int i = 0; i < doorNumbers; ++i)
-			{
-				int randomDoor = startX + rand() % (endX - startX + 1);
-				if (randomDoor % 2 != 0)
-				{
-					randomDoor++;
-					if (randomDoor > endX)
-						randomDoor -= 2;
-				}
-				maze[horizontalWall][randomDoor] = 2; // Пометка двери
-			}
-			// Рекурсивное разделение пространства выше и ниже стены
-			division(startX, endX, startY, horizontalWall - 1);
-			division(startX, endX, horizontalWall + 1, endY);
-		}
-	}
-	// Метод для создания границ для карты
-	void createBorders()
-	{
-		for (int i = 0; i < MAP_SIZE_HORIZONTAL; ++i)
-		{
-			maze[0][i] = 1;                         // Верхняя граница
-			maze[MAP_SIZE_VERTICAL - 1][i] = 1;     // Нижняя граница
-		}
-
-		for (int i = 0; i < MAP_SIZE_VERTICAL; ++i)
-		{
-			maze[i][0] = 1;                         // Левая граница
-			maze[i][MAP_SIZE_HORIZONTAL - 1] = 1;  // Правая граница
-		}
-	}
-public:
-	wstring MAP;
-	wstring INITIAL_MAP;
-	static constexpr int MAP_SIZE_HORIZONTAL = 60;       // Горизонтальный размер карты
-	static constexpr int MAP_SIZE_VERTICAL = 60;         // Вертикальный размер карты
-	pair<int, int> startCoordinat;
-	pair<int, int> finishCoordinat;
-	char teleportSkin = '&';
-	// Конструктор класса
-	MapInfo() { maze.resize(MAP_SIZE_VERTICAL, vector<int>(MAP_SIZE_HORIZONTAL, 0)); }
-	// Метод для отчищения карты
-	void clearMap() { MAP = INITIAL_MAP; }
-	// Метод для вывода карты подземелья в консоль
-	void printDungeon()
-	{
-		for (int y = 0; y < MAP_SIZE_VERTICAL; ++y)
-		{
-			for (int x = 0; x < MAP_SIZE_HORIZONTAL; ++x)
-			{
-				if (maze[y][x] == 0)
-					cout << '.'; // Пустое пространство
-				else if (maze[y][x] == 1)
-					cout << '#'; // Стена
-				else if (maze[y][x] == 2)
-					cout << 'D'; // Дверь
-				else
-					cout << '?'; // Не обработанный символ
-			}
-			cout << endl;
-		}
-	}
-	// Метод зачем то
-	vector<vector<int>> getIntMaze() { return maze; }
-	// Метод для перевода из масива в wstring
-	wstring getWstringMaze()
-	{
-		for (int y = 0; y < MAP_SIZE_VERTICAL; ++y)
-		{
-			for (int x = 0; x < MAP_SIZE_HORIZONTAL; ++x)
-			{
-				if (maze[y][x] == 0)
-					mazeString += L' '; // Пустое пространство
-				else if (maze[y][x] == 1)
-					mazeString += L'#'; // Стена
-				else if (maze[y][x] == 2)
-					mazeString += L' '; // Дверь
-				else
-					mazeString += L'?'; // Не обработанное
-			}
-			//mazeString += L'\n';
-		}
-		return mazeString;
-	}
-
-	void setStartCoordinat()
-	{
-		while (true)
-		{
-			startCoordinat.first = rand() % (MAP_SIZE_HORIZONTAL - 2) + 1;
-			startCoordinat.second = rand() % (MAP_SIZE_VERTICAL - 2) + 1;
-			if (MAP[startCoordinat.second * MAP_SIZE_HORIZONTAL + startCoordinat.first] != '#'
-				&& (startCoordinat.second < (MAP_SIZE_VERTICAL * 0.10) || startCoordinat.second >(MAP_SIZE_VERTICAL * 0.90))
-				|| (startCoordinat.first < (MAP_SIZE_HORIZONTAL * 0.10) || startCoordinat.first >(MAP_SIZE_HORIZONTAL * 0.90))
-				)
-				return;
-		}
-	}
-	void setFinishCoordinat()
-	{
-		while (true)
-		{
-			finishCoordinat.first = rand() % (MAP_SIZE_HORIZONTAL - 2) + 1;
-			finishCoordinat.second = rand() % (MAP_SIZE_VERTICAL - 2) + 1;
-			if (MAP[finishCoordinat.second * MAP_SIZE_HORIZONTAL + finishCoordinat.first] != '#' 
-				&& abs(finishCoordinat.first - startCoordinat.first) > MAP_SIZE_HORIZONTAL * 0.6
-				&& abs(finishCoordinat.second - startCoordinat.second) > MAP_SIZE_VERTICAL * 0.6)
-				return;
-		}
-	}
-	// Создание карты
-	void createMap()
-	{
-		createDungeon();
-		createBorders();
-		MAP = getWstringMaze();
-		setStartCoordinat();
-		MAP[startCoordinat.second * MAP_SIZE_HORIZONTAL + startCoordinat.first] = teleportSkin;
-		MAP[finishCoordinat.second * MAP_SIZE_HORIZONTAL + finishCoordinat.first] = teleportSkin;
-		INITIAL_MAP = MAP;
-	}
-};
-class Player
-{
-public:
-	int initialHp;
-	int Hp = 100;
-	double X;
-	double Y;
-	double R = 0;
-	double Speed = 4;
-	float Sensitivity = 5;
-	Player(int _X, int _Y)
-	{
-		X = _X;
-		Y = _Y;
-		initialHp = Hp;
-	}
-
-	void motion(MapInfo& mapInfo)
-	{
-		if (GetAsyncKeyState((unsigned short)'D') & 0x8000) R -= (Sensitivity * 0.75f) * timeInSeconds;
-		if (GetAsyncKeyState((unsigned short)'A') & 0x8000) R += (Sensitivity * 0.75f) * timeInSeconds;
-		if (GetAsyncKeyState((unsigned short)'W') & 0x8000)
-		{
-			X += sinf(R) * Speed * timeInSeconds;
-			Y += cosf(R) * Speed * timeInSeconds;
-			if (mapInfo.MAP[(int)Y * mapInfo.MAP_SIZE_HORIZONTAL + (int)X] == '#')
-			{
-				X -= sinf(R) * Speed * timeInSeconds;
-				Y -= cosf(R) * Speed * timeInSeconds;
-			}
-		}
-		if (GetAsyncKeyState((unsigned short)'S') & 0x8000)
-		{
-			X -= sinf(R) * Speed * timeInSeconds;
-			Y -= cosf(R) * Speed * timeInSeconds;
-			if (mapInfo.MAP[(int)Y * mapInfo.MAP_SIZE_HORIZONTAL + (int)X] == '#')
-			{
-				X += sinf(R) * Speed * timeInSeconds;
-				Y += cosf(R) * Speed * timeInSeconds;
-			}
-		}
-	}
 };
 
 void initialScreensaver()
@@ -408,7 +67,6 @@ void initialScreensaver()
 	printf("\x1b[0m\x1b[35;0H ~ Перед началом игры, РАСТЕНИТЕ окно до нужного размера . . .\n ~ ");
 	system("pause");
 }
-
 void getConsoleSize()
 {
 	HANDLE hWndConsole;
@@ -437,21 +95,20 @@ void cursoreVisibleFalse()
 	cursorInfo.bVisible = false;
 	SetConsoleCursorInfo(console, &cursorInfo);
 }
-
-void outputInfo(Player& player, MapInfo& mapInfo)
+void outputInfo()
 {
 	std::wstringstream stream;
 	stream << L" [ FPS: " << int(1 / timeInSeconds)
-		<< L" ] [ X: " << std::fixed << std::setprecision(2) << player.X
-		<< L" ] [ Y: " << std::fixed << std::setprecision(2) << player.Y
+		<< L" ] [ X: " << std::fixed << std::setprecision(2) << player.x
+		<< L" ] [ Y: " << std::fixed << std::setprecision(2) << player.y
 		<< L" ]  ";
 	wstring fpsString = stream.str();
-	wstring miniMap = L" ~ MAP ~ ";
+	wstring minimap = L" ~ map ~ ";
 	wstring hpTexture = L"";
 	wstring hp = L" ~ HP ~ ";
 	for (int i = 0; i <= player.initialHp; i += player.initialHp / 10)
 	{
-		if (i <= player.Hp) hpTexture += L" [\u2665]";
+		if (i <= player.hp) hpTexture += L" [\u2665]";
 		else hpTexture += L" [X]";
 	}
 	for (int i = 0; i < fpsString.size(); ++i)
@@ -470,25 +127,25 @@ void outputInfo(Player& player, MapInfo& mapInfo)
 		if (i % 2 == 0) screen[i + screenWidth * (screenHeight - 1)].Attributes = 4;
 		else screen[i + screenWidth * (screenHeight - 1)].Attributes = 15;
 	}
-	if (printMiniMap)
+	if (printMinimap)
 	{
-		for (int i = 0; i < miniMap.size(); ++i)
+		for (int i = 0; i < minimap.size(); ++i)
 		{
-			screen[i + screenWidth * 2].Char.UnicodeChar = miniMap[i];
+			screen[i + screenWidth * 2].Char.UnicodeChar = minimap[i];
 			screen[i + screenWidth * 2].Attributes = 7;
 		}
-		for (int x = 0; x < mapInfo.MAP_SIZE_HORIZONTAL; x++)
-			for (int y = 0; y < mapInfo.MAP_SIZE_VERTICAL; y++)
+		for (int x = 0; x < mapInfo.mapSizeHorizontal; x++)
+			for (int y = 0; y < mapInfo.mapSizeVertical; y++)
 			{
-				int index = (y * mapInfo.MAP_SIZE_HORIZONTAL) + x;
+				int index = (y * mapInfo.mapSizeHorizontal) + x;
 				if (x < screenWidth - 3 && y < screenHeight - 3)
 				{
-					screen[(y + 3) * screenWidth + x].Char.UnicodeChar = mapInfo.MAP[index];
+					screen[(y + 3) * screenWidth + x].Char.UnicodeChar = mapInfo.map[index];
 					screen[(y + 3) * screenWidth + x].Attributes = 15;
 				}
 			}
-		screen[((int)player.Y + 3) * screenWidth + (int)player.X].Char.UnicodeChar = L'☺';
-		screen[((int)player.Y + 3) * screenWidth + (int)player.X].Attributes = 9;
+		screen[((int)player.y + 3) * screenWidth + (int)player.x].Char.UnicodeChar = L'☺';
+		screen[((int)player.y + 3) * screenWidth + (int)player.x].Attributes = 9;
 		screen[(mapInfo.startCoordinat.second + 3) * screenWidth + (mapInfo.startCoordinat.first)].Char.UnicodeChar = '&';
 		screen[(mapInfo.startCoordinat.second + 3) * screenWidth + (mapInfo.startCoordinat.first)].Attributes = 5;
 		screen[(mapInfo.finishCoordinat.second + 3) * screenWidth + (mapInfo.finishCoordinat.first)].Char.UnicodeChar = '&';
@@ -496,7 +153,7 @@ void outputInfo(Player& player, MapInfo& mapInfo)
 
 	}
 }
-void settings(float& playerSensitivity, double& playerSpeed)
+void settings()
 {
 	int command = 5;
 	bool treker = true;
@@ -568,7 +225,7 @@ void settings(float& playerSensitivity, double& playerSpeed)
 		{
 			system("cls");
 			printf("\x1b[0m\t~ Настройки скорости ~\n_________________________________________________\n\n\x1b[0m");
-			for (int i = 1; i <= playerSpeed; i++)
+			for (int i = 1; i <= player.speed; i++)
 			{
 				if (i < 3) printf("\x1b[91m");
 				else if (i < 5) printf("\x1b[38;5;208m");
@@ -579,9 +236,9 @@ void settings(float& playerSensitivity, double& playerSpeed)
 
 			switch (_getwch())
 			{
-			case arrowLeft: playerSpeed = playerSpeed - 1 >= 1 ? playerSpeed -= 1 : 8;
+			case arrowLeft: player.speed = player.speed - 1 >= 1 ? player.speed -= 1 : 8;
 				break;
-			case arrowRight: playerSpeed = playerSpeed + 1 <= 8 ? playerSpeed += 1 : 1;
+			case arrowRight: player.speed = player.speed + 1 <= 8 ? player.speed += 1 : 1;
 				break;
 			case escape: treker = false;
 				break;
@@ -593,7 +250,7 @@ void settings(float& playerSensitivity, double& playerSpeed)
 		{
 			system("cls");
 			printf("\x1b[0m\t~ Настройки чувствительности ~\n_________________________________________________\n\n\x1b[0m");
-			for (double i = 1; i <= playerSensitivity; i += 1)
+			for (double i = 1; i <= player.sensitivity; i += 1)
 			{
 				if (i <= 3) printf("\x1b[91m");
 				else if (i <= 7) printf("\x1b[38;5;208m");
@@ -604,9 +261,9 @@ void settings(float& playerSensitivity, double& playerSpeed)
 
 			switch (_getwch())
 			{
-			case arrowLeft: playerSensitivity = playerSensitivity - 1 >= 1 ? playerSensitivity -= 1 : 10;
+			case arrowLeft: player.sensitivity = player.sensitivity - 1 >= 1 ? player.sensitivity -= 1 : 10;
 				break;
-			case arrowRight: playerSensitivity = playerSensitivity + 1 <= 10 ? playerSensitivity += 1 : 1;
+			case arrowRight: player.sensitivity = player.sensitivity + 1 <= 10 ? player.sensitivity += 1 : 1;
 				break;
 			case escape: treker = false;
 				break;
@@ -673,45 +330,30 @@ bool compareByModule(const pair<double, double>& point1, const pair<double, doub
 	double module2 = sqrt(point2.first * point2.first + point2.second * point2.second);
 	return module1 < module2;
 }
-
-int main()
+void RenderingConsoleGraphics()
 {
-	setlocale(LC_ALL, "rus");
-	srand(time(NULL));
-
-	MapInfo mapInfo;
-	mapInfo.createMap();
-	Player player(mapInfo.startCoordinat.first, mapInfo.startCoordinat.second);
-
-	cursoreVisibleFalse();
-	initialScreensaver();
-	getConsoleSize();
-	setScreenSize();
-
-	screen = new CHAR_INFO[screenWidth * screenHeight];
-
 	while (!gameOver)
 	{
-		mapInfo.clearMap();
+		mapInfo.clearmap();
 		timeFinish = chrono::high_resolution_clock::now();
 		timeInSeconds = chrono::duration<double>(timeFinish - timeStart).count();
 		timeStart = chrono::high_resolution_clock::now();
-		player.motion(mapInfo);
+		player.motion(mapInfo.map, mapInfo.mapSizeHorizontal , timeInSeconds);
 		if (_kbhit())
 		{
 			switch (_getwch())
 			{
 			case 109:
-				printMiniMap = printMiniMap ? false : true;
+				printMinimap = printMinimap ? false : true;
 				break;
-			case 27: settings(player.Sensitivity, player.Speed);
+			case 27: settings();
 				break;
 			}
 			cursoreVisibleFalse();
 		}
 		for (int x = 0; x < screenWidth; x++)
 		{
-			double rayAngle = player.R + fov / 2.0f - x * fov / screenWidth;
+			double rayAngle = player.r + fov / 2.0f - x * fov / screenWidth;
 			double rayX = sinf(rayAngle);
 			double rayY = cosf(rayAngle);
 			double distanceWall = 0;
@@ -723,16 +365,16 @@ int main()
 			while (!itWall && distanceWall < levelDrawing)
 			{
 				distanceWall += 0.01f;
-				int testX = (int)(player.X + rayX * distanceWall);
-				int testY = (int)(player.Y + rayY * distanceWall);
+				int testX = (int)(player.x + rayX * distanceWall);
+				int testY = (int)(player.y + rayY * distanceWall);
 
-				if (mapInfo.MAP[testY * mapInfo.MAP_SIZE_HORIZONTAL + testX] == L'&') { itTeleport = true; }
-				if (testX < 0 || testX >= mapInfo.MAP_SIZE_HORIZONTAL || testY < 0 || testY >= mapInfo.MAP_SIZE_VERTICAL)
+				if (mapInfo.map[testY * mapInfo.mapSizeHorizontal + testX] == L'&') { itTeleport = true; }
+				if (testX < 0 || testX >= mapInfo.mapSizeHorizontal || testY < 0 || testY >= mapInfo.mapSizeVertical)
 				{
 					itWall = true;
 					distanceWall = levelDrawing;
 				}
-				else if (mapInfo.MAP[testY * mapInfo.MAP_SIZE_HORIZONTAL + testX] == L'#' || itTeleport)
+				else if (mapInfo.map[testY * mapInfo.mapSizeHorizontal + testX] == L'#' || itTeleport)
 				{
 					itWall = true;
 					vector<pair<double, double>> boundsVector;
@@ -740,8 +382,8 @@ int main()
 					{
 						for (int ty = 0; ty < 2; ty++)
 						{
-							double vectorX = testX + tx - player.X;
-							double vectorY = testY + ty - player.Y;
+							double vectorX = testX + tx - player.x;
+							double vectorY = testY + ty - player.y;
 							double vectorModule = sqrt(vectorX * vectorX + vectorY * vectorY);
 							double cosAngle = rayX * vectorX / vectorModule + rayY * vectorY / vectorModule;
 							boundsVector.push_back(make_pair(vectorModule, cosAngle));
@@ -754,7 +396,7 @@ int main()
 						itBound = true;
 					}
 				}
-				else { mapInfo.MAP[testY * mapInfo.MAP_SIZE_HORIZONTAL + testX] = '.'; }
+				else { mapInfo.map[testY * mapInfo.mapSizeHorizontal + testX] = '.'; }
 			}
 
 			int celling = (float)(screenHeight / 2.0) - screenHeight / ((float)distanceWall);
@@ -805,7 +447,7 @@ int main()
 
 					if (itBound) screen[y * screenWidth + x].Attributes = 8;
 					else screen[y * screenWidth + x].Attributes = 8;
-				
+
 					if (itTeleport)
 					{
 						wchar_t teleportTexture;
@@ -844,22 +486,22 @@ int main()
 				}
 			}
 		}
-		outputInfo(player, mapInfo);
+		outputInfo();
 		WriteConsoleOutput(console, screen, bufferSize, { 0,0 }, &windowSize);
 	}
-	return 0;
 }
+void Run()
+{
+	mapInfo.createmap();
+	player.x = mapInfo.startCoordinat.first;
+	player.y = mapInfo.startCoordinat.second;
 
+	initialScreensaver();
+	cursoreVisibleFalse();
+	getConsoleSize();
+	setScreenSize();
 
+	screen = new CHAR_INFO[screenWidth * screenHeight];
 
-//#include <iostream>
-//int main()
-//{
-//	for (size_t i = 0; i < 256; i++)
-//	{
-//		Sleep(100);
-//		std::cout << char(i) << std::endl;
-//	}
-//
-//	return 0;
-//}
+	RenderingConsoleGraphics();
+}
