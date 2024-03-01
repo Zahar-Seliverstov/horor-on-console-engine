@@ -1,15 +1,14 @@
 #include "Library.h"
 #include "IPlayer.h"
 
-int initialHp;
-int hp = 100;
-double x;
-double y;
-double r = 0;
-double speed = 4;
-float sensitivity = 5;
-Player::Player() { initialHp = hp; }
-
+Player::Player() 
+{ 
+	hp = 100;
+	initialHp = hp;
+	r = 0;
+	speed = 4;
+	sensitivity = 5;
+}
 void Player::motion(wstring& map, const int& mapSizeHorizontal, double& ratioNumberFrames)
 {
 	if (GetAsyncKeyState((unsigned short)'D') & 0x8000) r -= (sensitivity * 0.75f) * ratioNumberFrames;

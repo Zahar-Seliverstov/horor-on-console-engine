@@ -5,21 +5,6 @@
 
 MapInfo mapInfo;
 Player player;
-HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-COORD bufferSize;
-SMALL_RECT windowSize;
-CHAR_INFO* screen;
-int screenWidth;
-int screenHeight;
-
-auto timeStart = chrono::high_resolution_clock::now();
-auto timeFinish = chrono::high_resolution_clock::now();
-double timeInSeconds;
-
-double levelDrawing = 10;
-double fov = 3.14159f / 3;
-bool gameOver = false;
-bool printMinimap = false;
 
 enum Keys
 {
@@ -35,7 +20,7 @@ enum Keys
 	keyS = 115
 };
 
-void initialScreensaver()
+void Engine::initialScreensaver()
 {
 	string nameGame[18] =
 	{
@@ -67,7 +52,7 @@ void initialScreensaver()
 	printf("\x1b[0m\x1b[35;0H ~ Перед началом игры, РАСТЕНИТЕ окно до нужного размера . . .\n ~ ");
 	system("pause");
 }
-void getConsoleSize()
+void Engine::getConsoleSize()
 {
 	HANDLE hWndConsole;
 	if (hWndConsole = GetStdHandle(-12))
@@ -81,21 +66,21 @@ void getConsoleSize()
 		}
 	}
 }
-void setScreenSize()
+void Engine::setScreenSize()
 {
 	bufferSize = { short(screenWidth), short(screenHeight) };
 	windowSize = { 0, 0, short(screenWidth - 1), short(screenHeight - 1) };
 	SetConsoleScreenBufferSize(console, bufferSize);
 	SetConsoleWindowInfo(console, TRUE, &windowSize);
 }
-void cursoreVisibleFalse()
+void Engine::cursoreVisibleFalse()
 {
 	CONSOLE_CURSOR_INFO cursorInfo;
 	GetConsoleCursorInfo(console, &cursorInfo);
 	cursorInfo.bVisible = false;
 	SetConsoleCursorInfo(console, &cursorInfo);
 }
-void outputInfo()
+void Engine::outputInfo()
 {
 	std::wstringstream stream;
 	stream << L" [ FPS: " << int(1 / timeInSeconds)
@@ -153,7 +138,7 @@ void outputInfo()
 
 	}
 }
-void settings()
+void Engine::settings()
 {
 	int command = 5;
 	bool treker = true;
@@ -324,13 +309,7 @@ void settings()
 		break;
 	}
 }
-bool compareByModule(const pair<double, double>& point1, const pair<double, double>& point2)
-{
-	double module1 = sqrt(point1.first * point1.first + point1.second * point1.second);
-	double module2 = sqrt(point2.first * point2.first + point2.second * point2.second);
-	return module1 < module2;
-}
-void RenderingConsoleGraphics()
+void Engine::RenderingConsoleGraphics()
 {
 	while (!gameOver)
 	{
@@ -338,7 +317,7 @@ void RenderingConsoleGraphics()
 		timeFinish = chrono::high_resolution_clock::now();
 		timeInSeconds = chrono::duration<double>(timeFinish - timeStart).count();
 		timeStart = chrono::high_resolution_clock::now();
-		player.motion(mapInfo.map, mapInfo.mapSizeHorizontal , timeInSeconds);
+		player.motion(mapInfo.map, mapInfo.mapSizeHorizontal, timeInSeconds);
 		if (_kbhit())
 		{
 			switch (_getwch())
@@ -389,7 +368,12 @@ void RenderingConsoleGraphics()
 							boundsVector.push_back(make_pair(vectorModule, cosAngle));
 						}
 					}
-					sort(boundsVector.begin(), boundsVector.end(), compareByModule);
+					sort(boundsVector.begin(), boundsVector.end(), [&](const pair<double, double>& point1, const pair<double, double>& point2)
+						{
+						double module1 = sqrt(point1.first * point1.first + point1.second * point1.second);
+						double module2 = sqrt(point2.first * point2.first + point2.second * point2.second);
+						return module1 < module2;
+						});
 					double boundAngle = 0.03 / distanceWall;
 					if ((acos(boundsVector[0].second) < boundAngle && distanceWall > 0.5)
 						|| (acos(boundsVector[1].second) < boundAngle && distanceWall > 0.5)) {
@@ -490,7 +474,7 @@ void RenderingConsoleGraphics()
 		WriteConsoleOutput(console, screen, bufferSize, { 0,0 }, &windowSize);
 	}
 }
-void Run()
+void Engine::Run()
 {
 	mapInfo.createmap();
 	player.x = mapInfo.startCoordinat.first;
@@ -504,4 +488,11 @@ void Run()
 	screen = new CHAR_INFO[screenWidth * screenHeight];
 
 	RenderingConsoleGraphics();
+}
+Engine::Engine()
+{
+	levelDrawing = 10;
+	fov = 3.14159f / 3;
+	gameOver = false;
+	printMinimap = false;
 }

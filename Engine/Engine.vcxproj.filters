@@ -22,7 +22,7 @@
     <Filter Include="Исходные файлы\Entities">
       <UniqueIdentifier>{25a9f6c2-fed7-4ef6-a307-62acbff6de4b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Исходные файлы\ConsoleEngine">
+    <Filter Include="Исходные файлы\Engine">
       <UniqueIdentifier>{27f25975-82a7-47f9-a865-8d65e03209a9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -40,7 +40,7 @@
       <Filter>Исходные файлы\Entities</Filter>
     </ClCompile>
     <ClCompile Include="Engine.cpp">
-      <Filter>Исходные файлы\ConsoleEngine</Filter>
+      <Filter>Исходные файлы\Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

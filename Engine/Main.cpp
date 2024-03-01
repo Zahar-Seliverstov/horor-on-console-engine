@@ -6,8 +6,8 @@ int main()
 	setlocale(LC_ALL, "rus");
 	srand(time(NULL));
 
-	Run();
-
-
+	Engine engine;	// Создание обьекта класса Engin который является основным для отрисовки в консоль 
+	engine.Run();	// Вызываем у этого обьекта метод Run что бы запустить вычисления 
+	
 	return 0;
 }

@@ -4,7 +4,6 @@
 class MapInfo
 {
 private:
-
 	// Метод для создания подземелья
 	void createDungeon();
 	// Рекурсивный метод для разделения пространства
@@ -14,14 +13,21 @@ private:
 	// Метод для создания границ для карты
 	void createBorders();
 public:
-
+	vector<vector<int>> maze;       // Двумерный вектор для хранения карты подземелья в виде значений
+	wstring mazeString;             // Двумерный вектор для хранения карты подземелья в виде строки
+	int ROOM_MIN_HORIZONTAL;        // Минимальная горизонтальная длина комнаты
+	int ROOM_MIN_VERTICAL;          // Минимальная вертикальная высота комнаты
+	int ROOM_MAX_HORIZONTAL;        // Максимальная горизонтальная длина комнаты
+	int ROOM_MAX_VERTICAL;          // Максимальная вертикальная высота комнаты
+	int EXTRA_DOOR_CHANCE;          // Шанс создания дополнительных дверей (%)
+	int MIN_LENGTH_FOR_EXTRA_DOOR;  // Минимальная длина пути для создания дополнительной двери
 	wstring map;
 	wstring initialMap;
-	static constexpr int mapSizeHorizontal = 60;       // Горизонтальный размер карты
-	static constexpr int mapSizeVertical = 60;         // Вертикальный размер карты
+	int mapSizeHorizontal;			// Горизонтальный размер карты
+	int mapSizeVertical;			// Вертикальный размер карты
 	pair<int, int> startCoordinat;
 	pair<int, int> finishCoordinat;
-	char teleportSkin = '&';
+	char teleportSkin;
 	// Конструктор класса
 	MapInfo();
 	// Метод для отчищения карты

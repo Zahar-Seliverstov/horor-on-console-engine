@@ -1,21 +1,6 @@
 #include "Library.h"
 #include "IMapInfo.h"
 
-vector<vector<int>> maze;                            // Двумерный вектор для хранения карты подземелья в виде значений
-wstring mazeString;                                  // Двумерный вектор для хранения карты подземелья в виде строки
-static constexpr int ROOM_MIN_HORIZONTAL = 6;        // Минимальная горизонтальная длина комнаты
-static constexpr int ROOM_MIN_VERTICAL = 6;          // Минимальная вертикальная высота комнаты
-static constexpr int ROOM_MAX_HORIZONTAL = 10;       // Максимальная горизонтальная длина комнаты
-static constexpr int ROOM_MAX_VERTICAL = 10;         // Максимальная вертикальная высота комнаты
-static constexpr int EXTRA_DOOR_CHANCE = 15;         // Шанс создания дополнительных дверей (%)
-static constexpr int MIN_LENGTH_FOR_EXTRA_DOOR = 40; // Минимальная длина пути для создания дополнительной двери
-wstring map;
-wstring initialMap;
-static constexpr int mapSizeHorizontal = 60;       // Горизонтальный размер карты
-static constexpr int mapSizeVertical = 60;         // Вертикальный размер карты
-pair<int, int> startCoordinat;
-pair<int, int> finishCoordinat;
-char teleportSkin = '&';
 // Метод для создания подземелья
 void MapInfo::createDungeon()
 {
@@ -173,7 +158,19 @@ void MapInfo::createBorders()
 	}
 }
 // Конструктор класса
-MapInfo::MapInfo() { maze.resize(mapSizeVertical, vector<int>(mapSizeHorizontal, 0)); }
+MapInfo::MapInfo() 
+{ 
+	maze.resize(mapSizeVertical, vector<int>(mapSizeHorizontal, 0)); 
+	ROOM_MIN_HORIZONTAL = 6;        // Минимальная горизонтальная длина комнаты
+	ROOM_MIN_VERTICAL = 6;          // Минимальная вертикальная высота комнаты
+	ROOM_MAX_HORIZONTAL = 10;       // Максимальная горизонтальная длина комнаты
+	ROOM_MAX_VERTICAL = 10;         // Максимальная вертикальная высота комнаты
+	EXTRA_DOOR_CHANCE = 15;         // Шанс создания дополнительных дверей (%)
+	MIN_LENGTH_FOR_EXTRA_DOOR = 40; // Минимальная длина пути для создания дополнительной двери
+	mapSizeHorizontal = 60;         // Горизонтальный размер карты
+	mapSizeVertical = 60;           // Вертикальный размер карты
+	teleportSkin = '&';
+}
 // Метод для отчищения карты
 void MapInfo::clearmap() { map = initialMap; }
 // Метод для вывода карты подземелья в консоль
@@ -195,7 +192,7 @@ void MapInfo::printDungeon()
 		cout << endl;
 	}
 }
-// Метод зачем то
+// Метод для получения maze
 vector<vector<int>> MapInfo::getIntMaze() { return maze; }
 // Метод для перевода из масива в wstring
 wstring MapInfo::getWstringMaze()
@@ -217,6 +214,7 @@ wstring MapInfo::getWstringMaze()
 	}
 	return mazeString;
 }
+// стартовые координаты телепорта
 void MapInfo::setStartCoordinat()
 {
 	while (true)
@@ -230,6 +228,7 @@ void MapInfo::setStartCoordinat()
 			return;
 	}
 }
+// Финишные координаты телепорта
 void MapInfo::setFinishCoordinat()
 {
 	while (true)
