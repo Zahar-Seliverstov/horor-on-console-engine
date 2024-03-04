@@ -157,20 +157,6 @@ void MapInfo::createBorders()
 		maze[i][mapSizeHorizontal - 1] = 1;  // Правая граница
 	}
 }
-// Конструктор класса
-MapInfo::MapInfo() 
-{ 
-	maze.resize(mapSizeVertical, vector<int>(mapSizeHorizontal, 0)); 
-	ROOM_MIN_HORIZONTAL = 6;        // Минимальная горизонтальная длина комнаты
-	ROOM_MIN_VERTICAL = 6;          // Минимальная вертикальная высота комнаты
-	ROOM_MAX_HORIZONTAL = 10;       // Максимальная горизонтальная длина комнаты
-	ROOM_MAX_VERTICAL = 10;         // Максимальная вертикальная высота комнаты
-	EXTRA_DOOR_CHANCE = 15;         // Шанс создания дополнительных дверей (%)
-	MIN_LENGTH_FOR_EXTRA_DOOR = 40; // Минимальная длина пути для создания дополнительной двери
-	mapSizeHorizontal = 60;         // Горизонтальный размер карты
-	mapSizeVertical = 60;           // Вертикальный размер карты
-	teleportSkin = '&';
-}
 // Метод для отчищения карты
 void MapInfo::clearmap() { map = initialMap; }
 // Метод для вывода карты подземелья в консоль
@@ -249,8 +235,21 @@ void MapInfo::createmap()
 	map = getWstringMaze();
 	setStartCoordinat();
 	setFinishCoordinat();
-	map[startCoordinat.second * mapSizeHorizontal + startCoordinat.first] = teleportSkin;
 	map[finishCoordinat.second * mapSizeHorizontal + finishCoordinat.first] = teleportSkin;
 	initialMap = map;
 }
-
+// Конструктор класса
+MapInfo::MapInfo()
+{
+	maze.resize(mapSizeVertical, vector<int>(mapSizeHorizontal, 0));
+	ROOM_MIN_HORIZONTAL = 6;        // Минимальная горизонтальная длина комнаты
+	ROOM_MIN_VERTICAL = 6;          // Минимальная вертикальная высота комнаты
+	ROOM_MAX_HORIZONTAL = 10;       // Максимальная горизонтальная длина комнаты
+	ROOM_MAX_VERTICAL = 10;         // Максимальная вертикальная высота комнаты
+	EXTRA_DOOR_CHANCE = 15;         // Шанс создания дополнительных дверей (%)
+	MIN_LENGTH_FOR_EXTRA_DOOR = 40; // Минимальная длина пути для создания дополнительной двери
+	mapSizeHorizontal = 60;         // Горизонтальный размер карты
+	mapSizeVertical = 60;           // Вертикальный размер карты
+	teleportSkin = '&';
+	NumberFloor = 1;
+}

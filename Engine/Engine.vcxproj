@@ -132,8 +132,10 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MapInfo.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Screensavers.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="IScreensavers.h" />
     <ClInclude Include="IEngine.h" />
     <ClInclude Include="IMonster.h" />
     <ClInclude Include="IPlayer.h" />

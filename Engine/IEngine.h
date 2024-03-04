@@ -5,7 +5,7 @@ enum Keys;
 class Engine
 {
 private:
-	void initialScreensaver();
+	void CheckPlayerInTeleport();
 	void getConsoleSize();
 	void setScreenSize();
 	void cursoreVisibleFalse();

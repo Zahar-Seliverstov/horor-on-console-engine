@@ -2,6 +2,7 @@
 #include "IMapInfo.h"
 #include "IPlayer.h"
 #include "IEngine.h"
+#include "IScreensavers.h"
 
 MapInfo mapInfo;
 Player player;
@@ -19,38 +20,17 @@ enum Keys
 	keyW = 119,
 	keyS = 115
 };
-
-void Engine::initialScreensaver()
+void Engine::CheckPlayerInTeleport()
 {
-	string nameGame[18] =
+	if (int(player.x) == mapInfo.finishCoordinat.first
+		&& int(player.y) == mapInfo.finishCoordinat.second)
 	{
-		"            #   #   ###   #     ###   ###   #\\ /#   ###      ###   ###               ",
-		"            # * #   #=    #     #     [ ]   # * #   #=        #    [ ]              ",
-		"            #/ \\#   ###   ###   ###   ###   #   #   ###       #    ###              ",
-		"                                                                                   ",
-		"                                                                                   ",
-		"    ____________    ____________    __        __    ____________    __________     ",
-		"   /           /|  /           /|  / /|      / /|  /           /|  /         /|    ",
-		"   ############ |  ############ |  ## |      ## |  ############ |  ########## /|   ",
-		"   ############/   ############ |  ## |      ## |  ############/   ########### |   ",
-		"        ## |       ## |      ## |  ## |      ## |  ## |_________   ##       ## |   ",
-		"        ## |       ## |      ## |  ## |      ## |  ##/         /|  ##       ##/    ",
-		"        ## |       ## |      ## |  ## |      ## |  ############ |  ########## |    ",
-		"        ## |       ## |      ## |  ## | ____ ## |  ############/   ##########/     ",
-		"        ## |       ## |______## |  ## |/   /\\## |  ## |________    ## |  ## \\      ",
-		"        ## |       ##/       ## |  ##/ ####  ## |  ##/         /|  ## |   ## \\     ",
-		"        ## |       ############ |  ####    #### |  ############ |  ## |    ## \\    ",
-		"        ##/        ############/   ##        ##/   ############/   ##/      ##/    ",
-		"                                                                                   "
-	};
-	printf("\n\n\n\n\n\n\x1b[31;48m");
-	string line = "";
-	for (int i = 0; i < 17; i++)
-	{
-		cout << "\t" << nameGame[i] << endl;
+		/*mapInfo.createmap();
+		player.x = mapInfo.startCoordinat.first;
+		player.y = mapInfo.startCoordinat.second;*/
+		DownloadScreensaver();
+		Run();
 	}
-	printf("\x1b[0m\x1b[35;0H ~ Перед началом игры, РАСТЕНИТЕ окно до нужного размера . . .\n ~ ");
-	system("pause");
 }
 void Engine::getConsoleSize()
 {
@@ -129,12 +109,12 @@ void Engine::outputInfo()
 					screen[(y + 3) * screenWidth + x].Attributes = 15;
 				}
 			}
-		screen[((int)player.y + 3) * screenWidth + (int)player.x].Char.UnicodeChar = L'☺';
-		screen[((int)player.y + 3) * screenWidth + (int)player.x].Attributes = 9;
-		screen[(mapInfo.startCoordinat.second + 3) * screenWidth + (mapInfo.startCoordinat.first)].Char.UnicodeChar = '&';
+		screen[((int)player.y + 3) * screenWidth + (int)player.x].Char.UnicodeChar = L'P';
+		screen[((int)player.y + 3) * screenWidth + (int)player.x].Attributes = 10;
+		screen[(mapInfo.startCoordinat.second + 3) * screenWidth + (mapInfo.startCoordinat.first)].Char.UnicodeChar = ' ';
 		screen[(mapInfo.startCoordinat.second + 3) * screenWidth + (mapInfo.startCoordinat.first)].Attributes = 5;
-		screen[(mapInfo.finishCoordinat.second + 3) * screenWidth + (mapInfo.finishCoordinat.first)].Char.UnicodeChar = '&';
-		screen[(mapInfo.finishCoordinat.second + 3) * screenWidth + (mapInfo.finishCoordinat.first)].Attributes = 5;
+		screen[(mapInfo.finishCoordinat.second + 3) * screenWidth + (mapInfo.finishCoordinat.first)].Char.UnicodeChar = 'F';
+		screen[(mapInfo.finishCoordinat.second + 3) * screenWidth + (mapInfo.finishCoordinat.first)].Attributes = 9;
 
 	}
 }
@@ -370,9 +350,9 @@ void Engine::RenderingConsoleGraphics()
 					}
 					sort(boundsVector.begin(), boundsVector.end(), [&](const pair<double, double>& point1, const pair<double, double>& point2)
 						{
-						double module1 = sqrt(point1.first * point1.first + point1.second * point1.second);
-						double module2 = sqrt(point2.first * point2.first + point2.second * point2.second);
-						return module1 < module2;
+							double module1 = sqrt(point1.first * point1.first + point1.second * point1.second);
+							double module2 = sqrt(point2.first * point2.first + point2.second * point2.second);
+							return module1 < module2;
 						});
 					double boundAngle = 0.03 / distanceWall;
 					if ((acos(boundsVector[0].second) < boundAngle && distanceWall > 0.5)
@@ -414,22 +394,19 @@ void Engine::RenderingConsoleGraphics()
 				{
 					wchar_t wallTexture;
 
-					if (itBound)
-					{
-						wallTexture = L' ';
-					}
-					else if (distanceWall <= levelDrawing / 4)
+					if (itBound) { wallTexture = L' '; }
+					else if (distanceWall <= levelDrawing / 5)
 						wallTexture = L'█';
-					else if (distanceWall <= levelDrawing / 3)
+					else if (distanceWall <= levelDrawing / 4)
 						wallTexture = L'▓';
-					else if (distanceWall <= levelDrawing / 2)
+					else if (distanceWall <= levelDrawing / 3)
 						wallTexture = L'▒';
 					else if (distanceWall <= levelDrawing / 1)
 						wallTexture = L'░';
 					else
 						wallTexture = ' ';
 
-					if (itBound) screen[y * screenWidth + x].Attributes = 8;
+					if (itBound) screen[y * screenWidth + x].Attributes = 0;
 					else screen[y * screenWidth + x].Attributes = 8;
 
 					if (itTeleport)
@@ -447,17 +424,25 @@ void Engine::RenderingConsoleGraphics()
 
 						}
 					}
+					else
+					{
+						if (itBound)
+						{
+							wallTexture = ' ';
+							screen[y * screenWidth + x].Attributes = 8;
+						}
+					}
 					screen[y * screenWidth + x].Char.UnicodeChar = wallTexture;
 				}
 				else
 				{
-					char floorTexture;
+					short floorTexture;
 
-					if (centerScreen < 0.15f)
+					if (centerScreen < 0.2f)
 						floorTexture = '&';
-					else if (centerScreen < 0.4f)
+					else if (centerScreen < 0.3f)
 						floorTexture = '#';
-					else if (centerScreen < 0.7f)
+					else if (centerScreen < 0.5f)
 						floorTexture = '*';
 					else if (centerScreen < 0.9f)
 						floorTexture = ':';
@@ -470,6 +455,7 @@ void Engine::RenderingConsoleGraphics()
 				}
 			}
 		}
+		CheckPlayerInTeleport();
 		outputInfo();
 		WriteConsoleOutput(console, screen, bufferSize, { 0,0 }, &windowSize);
 	}
@@ -479,11 +465,14 @@ void Engine::Run()
 	mapInfo.createmap();
 	player.x = mapInfo.startCoordinat.first;
 	player.y = mapInfo.startCoordinat.second;
+	//player.x = mapInfo.finishCoordinat.first + 1;
+	//player.y = mapInfo.finishCoordinat.second + 1;
 
-	initialScreensaver();
 	cursoreVisibleFalse();
+	initialScreensaver();
 	getConsoleSize();
 	setScreenSize();
+	PrintGameTitle(screenWidth, screenHeight);
 
 	screen = new CHAR_INFO[screenWidth * screenHeight];
 
