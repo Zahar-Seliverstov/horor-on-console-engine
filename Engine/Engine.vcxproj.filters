@@ -28,6 +28,9 @@
     <Filter Include="Исходные файлы\Helpers">
       <UniqueIdentifier>{6e494833-9977-4424-bbeb-ae7067053660}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\Helpers\Sounds">
+      <UniqueIdentifier>{ed75fbd0-35f4-4906-a762-120d27c6cedb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">

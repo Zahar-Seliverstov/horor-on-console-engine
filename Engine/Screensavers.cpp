@@ -38,16 +38,20 @@ void PrintGameTitle(int& screenWidth, int& screenHeight)
 	int startX = screenWidth / 2 - 45;
 	int startY = screenHeight / 2 - 9;
 	printf("\x1b[31;48m");
+
+	std::thread gg([]() {PlaySound(L"C:\\Languch\\c++\\Engin\\ConsoleEngine\\Engine\\zvuk-avtomobilnoy-avarii-tormojenie-zatem-udar-34123.mp3", NULL, SND_ASYNC); });
+	gg.detach();
+
 	this_thread::sleep_for(chrono::milliseconds(200));
 	for (int i = 0; i < 17; i++)
 	{
 		printf("\x1b[%d;%dH", startY + i, startX);
-		if (i < 5){this_thread::sleep_for(chrono::milliseconds(70));}
-		else if(i == 5){this_thread::sleep_for(chrono::milliseconds(600));}
-		else{this_thread::sleep_for(chrono::milliseconds(50));}
+		
+		if(i == 5 && i > 4){this_thread::sleep_for(chrono::milliseconds(500));}
+		else{this_thread::sleep_for(chrono::milliseconds(30));}
 		cout << "\t" << nameGame[i] << endl;
 	}
-	this_thread::sleep_for(chrono::milliseconds(2000));
+	this_thread::sleep_for(chrono::milliseconds(1000));
 }
 void DownloadScreensaver()
 {

@@ -15,6 +15,8 @@
 #include <iomanip>
 #include <sstream>
 #include <cmath>
-
+#include <thread>
+#include <Windows.h>
+#pragma comment(lib, "winmm.lib")
 using namespace std;
 

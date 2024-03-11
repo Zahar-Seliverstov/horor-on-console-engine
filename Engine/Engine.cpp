@@ -7,7 +7,11 @@
 MapInfo mapInfo;
 Player player;
 
-enum Keys
+void isPlaySound()
+{
+	PlaySound(L"go.wav", NULL, SND_ASYNC);
+}
+enum keys
 {
 	escape = 27,
 	enter = 13,
@@ -20,7 +24,7 @@ enum Keys
 	keyW = 119,
 	keyS = 115
 };
-void Engine::CheckPlayerInTeleport()
+void Engine::checkPlayerInTeleport()
 {
 	if (int(player.x) == mapInfo.finishCoordinat.first
 		&& int(player.y) == mapInfo.finishCoordinat.second)
@@ -289,10 +293,10 @@ void Engine::settings()
 		break;
 	}
 }
-void Engine::RenderingConsoleGraphics()
+void Engine::renderingConsoleGraphics()
 {
-	while (!gameOver)
-	{
+
+	while (!gameOver) {
 		mapInfo.clearmap();
 		timeFinish = chrono::high_resolution_clock::now();
 		timeInSeconds = chrono::duration<double>(timeFinish - timeStart).count();
@@ -300,18 +304,20 @@ void Engine::RenderingConsoleGraphics()
 		player.motion(mapInfo.map, mapInfo.mapSizeHorizontal, timeInSeconds);
 		if (_kbhit())
 		{
-			switch (_getwch())
-			{
-			case 109:
-				printMinimap = printMinimap ? false : true;
+			thread gg(isPlaySound);
+			gg.join();
+			switch (_getwch()) {
+			case 109: printMinimap = printMinimap ? false : true;
 				break;
 			case 27: settings();
 				break;
 			}
 			cursoreVisibleFalse();
 		}
-		for (int x = 0; x < screenWidth; x++)
-		{
+		else {
+
+		}
+		for (int x = 0; x < screenWidth; x++) {
 			double rayAngle = player.r + fov / 2.0f - x * fov / screenWidth;
 			double rayX = sinf(rayAngle);
 			double rayY = cosf(rayAngle);
@@ -321,26 +327,21 @@ void Engine::RenderingConsoleGraphics()
 			bool itMonster = false;
 			bool itBound = false;
 
-			while (!itWall && distanceWall < levelDrawing)
-			{
+			while (!itWall && distanceWall < levelDrawing) {
 				distanceWall += 0.01f;
 				int testX = (int)(player.x + rayX * distanceWall);
 				int testY = (int)(player.y + rayY * distanceWall);
 
 				if (mapInfo.map[testY * mapInfo.mapSizeHorizontal + testX] == L'&') { itTeleport = true; }
-				if (testX < 0 || testX >= mapInfo.mapSizeHorizontal || testY < 0 || testY >= mapInfo.mapSizeVertical)
-				{
+				if (testX < 0 || testX >= mapInfo.mapSizeHorizontal || testY < 0 || testY >= mapInfo.mapSizeVertical) {
 					itWall = true;
 					distanceWall = levelDrawing;
 				}
-				else if (mapInfo.map[testY * mapInfo.mapSizeHorizontal + testX] == L'#' || itTeleport)
-				{
+				else if (mapInfo.map[testY * mapInfo.mapSizeHorizontal + testX] == L'#' || itTeleport) {
 					itWall = true;
 					vector<pair<double, double>> boundsVector;
-					for (int tx = 0; tx < 2; tx++)
-					{
-						for (int ty = 0; ty < 2; ty++)
-						{
+					for (int tx = 0; tx < 2; tx++) {
+						for (int ty = 0; ty < 2; ty++) {
 							double vectorX = testX + tx - player.x;
 							double vectorY = testY + ty - player.y;
 							double vectorModule = sqrt(vectorX * vectorX + vectorY * vectorY);
@@ -348,11 +349,10 @@ void Engine::RenderingConsoleGraphics()
 							boundsVector.push_back(make_pair(vectorModule, cosAngle));
 						}
 					}
-					sort(boundsVector.begin(), boundsVector.end(), [&](const pair<double, double>& point1, const pair<double, double>& point2)
-						{
-							double module1 = sqrt(point1.first * point1.first + point1.second * point1.second);
-							double module2 = sqrt(point2.first * point2.first + point2.second * point2.second);
-							return module1 < module2;
+					sort(boundsVector.begin(), boundsVector.end(), [&](const pair<double, double>& point1, const pair<double, double>& point2) {
+						double module1 = sqrt(point1.first * point1.first + point1.second * point1.second);
+						double module2 = sqrt(point2.first * point2.first + point2.second * point2.second);
+						return module1 < module2;
 						});
 					double boundAngle = 0.03 / distanceWall;
 					if ((acos(boundsVector[0].second) < boundAngle && distanceWall > 0.5)
@@ -421,7 +421,6 @@ void Engine::RenderingConsoleGraphics()
 						{
 							wallTexture = L'↑';
 							screen[y * screenWidth + x].Attributes = 3;
-
 						}
 					}
 					else
@@ -451,11 +450,10 @@ void Engine::RenderingConsoleGraphics()
 
 					screen[y * screenWidth + x].Char.UnicodeChar = floorTexture;
 					screen[y * screenWidth + x].Attributes = 8;
-
 				}
 			}
 		}
-		CheckPlayerInTeleport();
+		checkPlayerInTeleport();
 		outputInfo();
 		WriteConsoleOutput(console, screen, bufferSize, { 0,0 }, &windowSize);
 	}
@@ -476,7 +474,7 @@ void Engine::Run()
 
 	screen = new CHAR_INFO[screenWidth * screenHeight];
 
-	RenderingConsoleGraphics();
+	renderingConsoleGraphics();
 }
 Engine::Engine()
 {

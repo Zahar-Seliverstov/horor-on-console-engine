@@ -1,17 +1,18 @@
 #pragma once
 #include "Library.h"
 
-enum Keys;
+enum keys;
 class Engine
 {
 private:
-	void CheckPlayerInTeleport();
+	void isPlaySound();
+	void checkPlayerInTeleport();
 	void getConsoleSize();
 	void setScreenSize();
 	void cursoreVisibleFalse();
 	void outputInfo();
 	void settings();
-	void RenderingConsoleGraphics();
+	void renderingConsoleGraphics();
 public:
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 	COORD bufferSize;
