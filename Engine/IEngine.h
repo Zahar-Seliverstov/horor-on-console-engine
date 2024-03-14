@@ -5,7 +5,6 @@ enum keys;
 class Engine
 {
 private:
-	void isPlaySound();
 	void checkPlayerInTeleport();
 	void getConsoleSize();
 	void setScreenSize();

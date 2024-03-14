@@ -7,10 +7,6 @@
 MapInfo mapInfo;
 Player player;
 
-void isPlaySound()
-{
-	PlaySound(L"go.wav", NULL, SND_ASYNC);
-}
 enum keys
 {
 	escape = 27,
@@ -24,6 +20,13 @@ enum keys
 	keyW = 119,
 	keyS = 115
 };
+Engine::Engine()
+{
+	levelDrawing = 10;
+	fov = 3.14159f / 2;
+	gameOver = false;
+	printMinimap = false;
+}
 void Engine::checkPlayerInTeleport()
 {
 	if (int(player.x) == mapInfo.finishCoordinat.first
@@ -124,35 +127,38 @@ void Engine::outputInfo()
 }
 void Engine::settings()
 {
+	int startX = screenWidth / 2;
+	int startY = screenHeight / 2 - 5;
 	int command = 5;
 	bool treker = true;
-	vector<wstring> items{
-		L"   [^] Дальность прорисовки    ",
-		L"   [S] Скорость ходьбы         ",
-		L"   [-] Чувствительность        ",
-		L"   [R] Поле зрения             ",
-		L"   [S] Размер экрана           ",
-		L"   [<] Продолжить              ",
-		L"   [X] Выйти из игры           " };
+	vector<string> items{
+		"   [^] Дальность прорисовки    ",
+		"   [S] Скорость ходьбы         ",
+		"   [-] Чувствительность        ",
+		"   [R] Поле зрения             ",
+		"   [S] Размер экрана           ",
+		"   [<] Продолжить              ",
+		"   [X] Выйти из игры           " };
 
 	system("cls");
-	while (treker)
-	{
-		printf("\x1b[H\x1b[0m\t~ Меню настроек ~\n_______________________________\n\n\x1b[90m\x1b[48; 5; 0m");
-		for (int i = 0; i < items.size(); i++)
-		{
+	while (treker) {
+		printf("\x1b[%d;%dH", startY - 5, startX - 15);
+		printf("\x1b[0m________ \x1b[93mМеню настроек\x1b[0m ________\n\n\x1b[90m\x1b[48; 5; 0m");
+		for (int i = 0; i < items.size(); i++) {
+			printf("\x1b[%d;%dH", (startY + i + 2) - 5, startX - 15);
 			if (i == command)
 			{
 				if (i == items.size() - 1) printf("\x1b[38;5;0m\x1b[48;5;9m");
 				else printf("\x1b[38;5;0m\x1b[48;5;15m");
-				wcout << items.at(i) << endl;
+				cout << items.at(i) << endl;
 				printf("\x1b[90m\x1b[48;5;0m");
 			}
-			else wcout << items.at(i) << endl;
+			else cout << items.at(i) << endl;
 		}
+		printf("\x1b[%d;%dH", startY + 9 - 5, startX - 15);
+		printf("\x1b[0m_______________________________");
 
-		switch (_getwch())
-		{
+		switch (_getwch()) {
 		case arrowUp: command = command - 1 >= 0 ? command -= 1 : items.size() - 1;
 			break;
 		case arrowDown: command = command < items.size() - 1 ? command += 1 : 0;
@@ -162,46 +168,59 @@ void Engine::settings()
 		}
 	}
 	treker = true;
-	switch (command)
-	{
-	case 0:
-		while (treker)
-		{
-			system("cls");
-			printf("\x1b[0m\t~ Настройки уровня прорисовки ~\n_________________________________________________\n\n\x1b[0m");
-			for (int i = 2; i <= levelDrawing; i++)
-			{
-				if (i < 7) printf("\x1b[91m");
-				else if (i < 15) printf("\x1b[38;5;208m");
+	system("cls");
+	switch (command) {
+	case 0:// УРОВЕНЬ ПРОРИСОВКИ
+		while (treker) {
+			printf("\x1b[%d;%dH", startY - 3, startX - 25);
+			printf("\x1b[0m__________ Настройки уровня прорисовки __________");
+			printf("\x1b[%d;%dH", startY - 1, startX - 25);
+			for (int i = 1; i <= levelDrawing - 1; i++) {
+				if (i < 5) printf("\x1b[91m");
+				else if (i < 8) printf("\x1b[38;5;208m");
+				else if (i < 11) printf("\x1b[92m");
 				else printf("\x1b[92m");
 				cout << "[" << i << "]";
 			}
-			printf("\x1b[90m\n\n {A} <-+-> {D}\n\n\n <= {esc}");
+			cout << "                                                   ";
+			printf("\x1b[%d;%dH", startY + 1, startX - 25);
+			printf(" \x1b[91m~\x1b[0m Управление \x1b[93m <-+->");
+			printf("\x1b[%d;%dH", startY + 2, startX - 25);
+			cout << "\x1b[0m_________________________________________________";
+			printf("\x1b[%d;%dH", startY + 4, startX - 25);
+			cout << "\x1b[90m <== { \x1b[97mesc\x1b[90m }";
 
-			switch (_getwch())
-			{
-			case arrowLeft: levelDrawing = levelDrawing - 1 >= 2 ? levelDrawing -= 1 : 20;
+			switch (_getwch()) {
+			case arrowLeft: levelDrawing = levelDrawing - 1 >= 2 ? levelDrawing -= 1 : 15;
 				break;
-			case arrowRight: levelDrawing = levelDrawing + 1 <= 20 ? levelDrawing += 1 : 2;
+			case arrowRight: levelDrawing = levelDrawing + 1 <= 15 ? levelDrawing += 1 : 2;
 				break;
 			case escape: treker = false;
 				break;
 			}
 		}
 		break;
-	case 1:
+	case 1://	CКОРОСТЬ
 		while (treker)
 		{
-			system("cls");
-			printf("\x1b[0m\t~ Настройки скорости ~\n_________________________________________________\n\n\x1b[0m");
-			for (int i = 1; i <= player.speed; i++)
-			{
+			printf("\x1b[%d;%dH", startY - 3, startX - 15);
+			printf("\x1b[0m______Настройки скорости______\n\n\x1b[0m");
+			printf("\x1b[%d;%dH", startY - 1, startX - 15);
+			for (int i = 1; i <= player.speed; i++) {
 				if (i < 3) printf("\x1b[91m");
-				else if (i < 5) printf("\x1b[38;5;208m");
-				else printf("\x1b[92m");
+				else if (i < 4)  printf("\x1b[38;5;208m");
+				else if (i < 6) printf("\x1b[92m");
+				else if (i < 7)  printf("\x1b[38;5;208m");
+				else printf("\x1b[91m");
 				cout << "[" << i << "]";
 			}
-			printf("\x1b[90m\n\n {A} <-+-> {D}\n\n\n <= {esc}");
+			cout << "                                       ";
+			printf("\x1b[%d;%dH", startY + 1, startX - 15);
+			printf(" \x1b[91m~\x1b[0m Управление \x1b[93m <-+->");
+			printf("\x1b[%d;%dH", startY + 2, startX - 15);
+			cout << "\x1b[0m______________________________";
+			printf("\x1b[%d;%dH", startY + 4, startX - 15);
+			printf("\x1b[90m <== { \x1b[0mesc\x1b[90m }");
 
 			switch (_getwch())
 			{
@@ -214,22 +233,28 @@ void Engine::settings()
 			}
 		}
 		break;
-	case 2:
-		while (treker)
-		{
-			system("cls");
-			printf("\x1b[0m\t~ Настройки чувствительности ~\n_________________________________________________\n\n\x1b[0m");
-			for (double i = 1; i <= player.sensitivity; i += 1)
-			{
-				if (i <= 3) printf("\x1b[91m");
-				else if (i <= 7) printf("\x1b[38;5;208m");
-				else printf("\x1b[92m");
+	case 2://	ЧУВСТВИТЕЛЬНОСТЬ
+		while (treker) {
+			printf("\x1b[%d;%dH", startY - 3, startX - 16);
+			printf("\x1b[0m___Настройки чувствительности___\x1b[0m\n");
+			printf("\x1b[%d;%dH", startY - 1, startX - 16);
+			for (double i = 1; i <= player.sensitivity; i += 1) {
+				if (i < 3) printf("\x1b[91m");
+				else if (i < 4) printf("\x1b[38;5;208m");
+				else if (i < 7) printf("\x1b[92m");
+				else if (i < 9) printf("\x1b[38;5;208m");
+				else printf("\x1b[91m");
 				cout << "[" << i << "]";
 			}
-			printf("\x1b[90m\n\n {A} <-+-> {D}\n\n\n <= {esc}");
+			cout << "                                       ";
+			printf("\x1b[%d;%dH", startY + 1, startX - 16);
+			printf("\x1b[91m~ \x1b[0mУправление  \x1b[93m<-+->");
+			printf("\x1b[%d;%dH", startY + 2, startX - 16);
+			printf("\x1b[0m________________________________\x1b[0m\n");
+			printf("\x1b[%d;%dH", startY + 4, startX - 16);
+			printf("\x1b[90m <== { \x1b[0mesc\x1b[90m }");
 
-			switch (_getwch())
-			{
+			switch (_getwch()) {
 			case arrowLeft: player.sensitivity = player.sensitivity - 1 >= 1 ? player.sensitivity -= 1 : 10;
 				break;
 			case arrowRight: player.sensitivity = player.sensitivity + 1 <= 10 ? player.sensitivity += 1 : 1;
@@ -239,48 +264,65 @@ void Engine::settings()
 			}
 		}
 		break;
-	case 3:
-		while (treker)
-		{
-			system("cls");
-			printf("\x1b[0m\t~ Настройки поля зрения ~\n_________________________________________________\n\n\x1b[0m");
-			for (double i = 0.5; i <= fov; i += 0.5)
-			{
-				if (i <= 1.5) printf("\x1b[91m");
-				else if (i <= 2.5) printf("\x1b[38;5;208m");
-				else printf("\x1b[92m");
+	case 3://	ПОЛЕ ЗРЕНИЯ
+		
+		while (treker) {
+			printf("\x1b[%d;%dH", startY - 3, startX - 14);
+			printf("\x1b[0m___ Настройки поля зрения ___\n\n\x1b[0m");
+			printf("\x1b[%d;%dH", startY - 1, startX - 14);
+			for (double i = 1; i <= fov * 2; i++) {
+				if (i < 2) printf("\x1b[91m");
+				else if (i < 3) printf("\x1b[38;5;208m");
+				else if (i < 5) printf("\x1b[92m");
+				else if (i < 6)  printf("\x1b[38;5;208m");
+				else printf("\x1b[91m");
 				cout << "[" << i << "]";
 			}
-			printf("\x1b[90m\n\n {A} <-+-> {D}\n\n\n <= {esc}");
+			cout << "                                       ";
+			printf("\x1b[%d;%dH", startY + 1, startX - 14);
+			printf("\x1b[91m~\x1b[0m Управление \x1b[93m <-+->");
+			printf("\x1b[%d;%dH", startY + 2, startX - 14);
+			printf("\x1b[0m_____________________________");
+			printf("\x1b[%d;%dH", startY + 4, startX - 14);
+			printf("\x1b[90m <== { \x1b[0mesc\x1b[90m }");
 
 			switch (_getwch())
 			{
-			case arrowLeft: fov = fov - 0.5 >= 0.5 ? fov -= 0.5 : 4;
+			case arrowLeft: fov = fov - 0.5 > 0 ? fov -= 0.5 : 3.5;
 				break;
-			case arrowRight: fov = fov + 0.5 <= 4 ? fov += 0.5 : 0.5;
+			case arrowRight: fov = fov + 0.5 < 4 ? fov += 0.5 : 0.5;
 				break;
 			case escape: treker = false;
 				break;
 			}
 		}
 		break;
-	case 4:
+	case 4://	ЭКРАН
 		while (treker)
 		{
+			startX = screenWidth / 2;
+			startY = screenHeight / 2 - 5;
+
 			system("cls");
 			getConsoleSize();
-			printf("\x1b[0m\t~ Настройки экрана ~\n_________________________________________\n\n\x1b[91m  < Растените окно до нужного размера >\x1b[90m\n\n  Размер окна: \x1b[0m");
+			printf("\x1b[%d;%dH", startY - 3, startX - 20);
+			printf("\x1b[0m____________ \x1b[0mНастройка экрана\x1b[0m ____________");
+			printf("\x1b[%d;%dH", startY + 2 - 3, startX - 20);
+			printf("\x1b[90m # \x1b[94mРастените окно до нужного размера\x1b[90m. . .");
+			printf("\x1b[%d;%dH", startY + 4 - 3, startX - 20);
+			printf("\x1b[91m ~\x1b[0m Размеры \x1b[90m[ \x1b[93m");
+			cout << (to_string(screenWidth) + " \x1b[90mx\x1b[93m " + to_string(screenHeight) + " \x1b[90m]");
+			printf("\x1b[%d;%dH", startY + 5 - 3, startX - 20);
+			printf("\x1b[0m__________________________________________");
+			printf("\x1b[%d;%dH", startY + 7 - 3, startX - 20);
+			printf("\x1b[90m <== { \x1b[0mesc\x1b[90m }");
 
-			cout << screenWidth << " x " << screenHeight;
-			printf("\x1b[90m\n\n\n  <= {esc}");
-			if (_kbhit())
-			{
-				switch (_getch())
-				{
+			if (_kbhit()) {
+				switch (_getch()) {
 				case escape: treker = false;
 				}
 			}
-			this_thread::sleep_for(chrono::milliseconds(200));
+			this_thread::sleep_for(chrono::milliseconds(400));
 		}
 		setScreenSize();
 		delete[] screen, screen = nullptr;
@@ -292,20 +334,19 @@ void Engine::settings()
 		exit(0);
 		break;
 	}
+	settings();
 }
 void Engine::renderingConsoleGraphics()
 {
-
 	while (!gameOver) {
 		mapInfo.clearmap();
 		timeFinish = chrono::high_resolution_clock::now();
 		timeInSeconds = chrono::duration<double>(timeFinish - timeStart).count();
 		timeStart = chrono::high_resolution_clock::now();
 		player.motion(mapInfo.map, mapInfo.mapSizeHorizontal, timeInSeconds);
-		if (_kbhit())
-		{
-			thread gg(isPlaySound);
-			gg.join();
+		if (_kbhit()) {
+			/*thread gg(isPlaySound);
+			gg.join();*/
 			switch (_getwch()) {
 			case 109: printMinimap = printMinimap ? false : true;
 				break;
@@ -460,26 +501,22 @@ void Engine::renderingConsoleGraphics()
 }
 void Engine::Run()
 {
+	initialScreensaver();
 	mapInfo.createmap();
+	// Появление в далеке от телепорта
 	player.x = mapInfo.startCoordinat.first;
 	player.y = mapInfo.startCoordinat.second;
+
+	// Появление рядом с телепортом
 	//player.x = mapInfo.finishCoordinat.first + 1;
 	//player.y = mapInfo.finishCoordinat.second + 1;
 
 	cursoreVisibleFalse();
-	initialScreensaver();
 	getConsoleSize();
 	setScreenSize();
-	PrintGameTitle(screenWidth, screenHeight);
+	//PrintGameTitle(screenWidth, screenHeight);
 
 	screen = new CHAR_INFO[screenWidth * screenHeight];
 
 	renderingConsoleGraphics();
-}
-Engine::Engine()
-{
-	levelDrawing = 10;
-	fov = 3.14159f / 3;
-	gameOver = false;
-	printMinimap = false;
 }
