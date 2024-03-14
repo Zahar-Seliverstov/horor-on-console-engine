@@ -35,7 +35,9 @@ void Engine::checkPlayerInTeleport()
 		/*mapInfo.createmap();
 		player.x = mapInfo.startCoordinat.first;
 		player.y = mapInfo.startCoordinat.second;*/
-		DownloadScreensaver();
+		system("cls");
+		DownloadScreensaver(screenWidth, screenHeight);
+		system("cls");
 		Run();
 	}
 }
@@ -504,12 +506,12 @@ void Engine::Run()
 	initialScreensaver();
 	mapInfo.createmap();
 	// Появление в далеке от телепорта
-	player.x = mapInfo.startCoordinat.first;
-	player.y = mapInfo.startCoordinat.second;
+	//player.x = mapInfo.startCoordinat.first;
+	//player.y = mapInfo.startCoordinat.second;
 
 	// Появление рядом с телепортом
-	//player.x = mapInfo.finishCoordinat.first + 1;
-	//player.y = mapInfo.finishCoordinat.second + 1;
+	player.x = mapInfo.finishCoordinat.first + 1;
+	player.y = mapInfo.finishCoordinat.second + 1;
 
 	cursoreVisibleFalse();
 	getConsoleSize();

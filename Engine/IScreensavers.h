@@ -2,4 +2,4 @@
 
 void initialScreensaver();
 void PrintGameTitle(int& screenWidth, int& screenHeight);
-void DownloadScreensaver();
+void DownloadScreensaver(int& screenWidth, int& screenHeight);

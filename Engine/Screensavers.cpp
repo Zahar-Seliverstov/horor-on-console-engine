@@ -1,4 +1,5 @@
 ﻿#include "Library.h"
+#include <fstream>
 
 void initialScreensaver()
 {
@@ -60,14 +61,59 @@ void PrintGameTitle(int& screenWidth, int& screenHeight)
 	}
 	this_thread::sleep_for(chrono::milliseconds(1000));
 }
-void DownloadScreensaver()
+void DownloadScreensaver(int& screenWidth, int& screenHeight)
 {
-	string screenSaver = "";
-	for (int i = 0; i < 10; i++)
+	string path = "animationPortal.txt";
+	ifstream file(path);
+
+	vector<vector<string>> arr;
+
+	if (file.is_open())
 	{
-		this_thread::sleep_for(chrono::milliseconds(900));
-		screenSaver += ">{ }<";
-		system("cls");
-		cout << screenSaver;
+		string str;
+		// Считываем весь файл в одну строку
+		getline(file, str, '\0');
+		file.close();
+
+		// Разделяем строку на кадры
+		size_t pos = 0;
+		string delimiter1 = "\\f";
+		while ((pos = str.find(delimiter1)) != string::npos)
+		{
+			string frame = str.substr(0, pos);
+			str.erase(0, (pos + delimiter1.length() + 1));
+
+			vector<string> lines;
+
+			// Разделяем кадр на строки
+			pos = 0;
+			string delimiter2 = "\n";
+			while ((pos = frame.find(delimiter2)) != string::npos)
+			{
+				string line = frame.substr(0, pos);
+				frame.erase(0, (pos + delimiter2.length()));
+				lines.push_back(line);
+				line.erase();
+			}
+
+			arr.push_back(lines);
+			lines.clear();
+		}
+
+		screenWidth = (screenWidth / 2) - (arr[0][0].length() / 2);
+		screenHeight = (screenHeight / 2) - (arr[0].size() / 2);
+		// Выводим кадры
+		for (int i = 0; i < arr.size(); i++)
+		{
+			printf("\x1b[H"); // Перемещаем курсор в начало экрана
+			for (int j = 0; j < arr[i].size(); j++)
+			{
+				printf("\x1b[%d;%dH", screenHeight + j, screenWidth);
+				cout << arr[i][j] << endl;
+			}
+			Sleep(100);
+		}
 	}
+	else
+		throw std::exception("Error open file");
 }
