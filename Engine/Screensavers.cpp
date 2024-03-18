@@ -50,7 +50,7 @@ void PrintGameTitle(int& screenWidth, int& screenHeight)
 	std::thread gg([]() {PlaySound(L"C:\\Languch\\c++\\Engin\\ConsoleEngine\\Engine\\zvuk-avtomobilnoy-avarii-tormojenie-zatem-udar-34123.mp3", NULL, SND_ASYNC); });
 	gg.detach();
 
-	this_thread::sleep_for(chrono::milliseconds(200));
+	this_thread::sleep_for(chrono::milliseconds(100));
 	for (int i = 0; i < 17; i++)
 	{
 		printf("\x1b[%d;%dH", startY + i, startX);

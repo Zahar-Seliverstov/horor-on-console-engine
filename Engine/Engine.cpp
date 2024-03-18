@@ -87,26 +87,26 @@ void Engine::outputInfo()
 	}
 	for (int i = 0; i < fpsString.size(); ++i)
 	{
-		screen[i].Char.UnicodeChar = fpsString[i];
-		screen[i].Attributes = 11;
+		calculationScreen[i].Char.UnicodeChar = fpsString[i];
+		calculationScreen[i].Attributes = 11;
 	}
 	for (int i = 0; i < hp.length(); i++)
 	{
-		screen[i + screenWidth * (screenHeight - 2)].Char.UnicodeChar = hp[i];
-		screen[i + screenWidth * (screenHeight - 2)].Attributes = 7;
+		calculationScreen[i + screenWidth * (screenHeight - 2)].Char.UnicodeChar = hp[i];
+		calculationScreen[i + screenWidth * (screenHeight - 2)].Attributes = 7;
 	}
 	for (int i = 0; i < hpTexture.size(); i++)
 	{
-		screen[i + screenWidth * (screenHeight - 1)].Char.UnicodeChar = hpTexture[i];
-		if (i % 2 == 0) screen[i + screenWidth * (screenHeight - 1)].Attributes = 4;
-		else screen[i + screenWidth * (screenHeight - 1)].Attributes = 15;
+		calculationScreen[i + screenWidth * (screenHeight - 1)].Char.UnicodeChar = hpTexture[i];
+		if (i % 2 == 0) calculationScreen[i + screenWidth * (screenHeight - 1)].Attributes = 4;
+		else calculationScreen[i + screenWidth * (screenHeight - 1)].Attributes = 15;
 	}
 	if (printMinimap)
 	{
 		for (int i = 0; i < minimap.size(); ++i)
 		{
-			screen[i + screenWidth * 2].Char.UnicodeChar = minimap[i];
-			screen[i + screenWidth * 2].Attributes = 7;
+			calculationScreen[i + screenWidth * 2].Char.UnicodeChar = minimap[i];
+			calculationScreen[i + screenWidth * 2].Attributes = 7;
 		}
 		for (int x = 0; x < mapInfo.mapSizeHorizontal; x++)
 			for (int y = 0; y < mapInfo.mapSizeVertical; y++)
@@ -114,16 +114,16 @@ void Engine::outputInfo()
 				int index = (y * mapInfo.mapSizeHorizontal) + x;
 				if (x < screenWidth - 3 && y < screenHeight - 3)
 				{
-					screen[(y + 3) * screenWidth + x].Char.UnicodeChar = mapInfo.map[index];
-					screen[(y + 3) * screenWidth + x].Attributes = 15;
+					calculationScreen[(y + 3) * screenWidth + x].Char.UnicodeChar = mapInfo.map[index];
+					calculationScreen[(y + 3) * screenWidth + x].Attributes = 15;
 				}
 			}
-		screen[((int)player.y + 3) * screenWidth + (int)player.x].Char.UnicodeChar = L'P';
-		screen[((int)player.y + 3) * screenWidth + (int)player.x].Attributes = 10;
-		screen[(mapInfo.startCoordinat.second + 3) * screenWidth + (mapInfo.startCoordinat.first)].Char.UnicodeChar = ' ';
-		screen[(mapInfo.startCoordinat.second + 3) * screenWidth + (mapInfo.startCoordinat.first)].Attributes = 5;
-		screen[(mapInfo.finishCoordinat.second + 3) * screenWidth + (mapInfo.finishCoordinat.first)].Char.UnicodeChar = 'F';
-		screen[(mapInfo.finishCoordinat.second + 3) * screenWidth + (mapInfo.finishCoordinat.first)].Attributes = 9;
+		calculationScreen[((int)player.y + 3) * screenWidth + (int)player.x].Char.UnicodeChar = L'P';
+		calculationScreen[((int)player.y + 3) * screenWidth + (int)player.x].Attributes = 10;
+		calculationScreen[(mapInfo.startCoordinat.second + 3) * screenWidth + (mapInfo.startCoordinat.first)].Char.UnicodeChar = ' ';
+		calculationScreen[(mapInfo.startCoordinat.second + 3) * screenWidth + (mapInfo.startCoordinat.first)].Attributes = 5;
+		calculationScreen[(mapInfo.finishCoordinat.second + 3) * screenWidth + (mapInfo.finishCoordinat.first)].Char.UnicodeChar = 'F';
+		calculationScreen[(mapInfo.finishCoordinat.second + 3) * screenWidth + (mapInfo.finishCoordinat.first)].Attributes = 9;
 
 	}
 }
@@ -340,15 +340,14 @@ void Engine::settings()
 }
 void Engine::renderingConsoleGraphics()
 {
+	calculationScreen = new CHAR_INFO[screenWidth * screenHeight];
 	while (!gameOver) {
 		mapInfo.clearmap();
 		timeFinish = chrono::high_resolution_clock::now();
 		timeInSeconds = chrono::duration<double>(timeFinish - timeStart).count();
 		timeStart = chrono::high_resolution_clock::now();
 		player.motion(mapInfo.map, mapInfo.mapSizeHorizontal, timeInSeconds);
-		if (_kbhit()) {
-			/*thread gg(isPlaySound);
-			gg.join();*/
+	/*	if (_kbhit()) {
 			switch (_getwch()) {
 			case 109: printMinimap = printMinimap ? false : true;
 				break;
@@ -356,10 +355,7 @@ void Engine::renderingConsoleGraphics()
 				break;
 			}
 			cursoreVisibleFalse();
-		}
-		else {
-
-		}
+		}*/
 		for (int x = 0; x < screenWidth; x++) {
 			double rayAngle = player.r + fov / 2.0f - x * fov / screenWidth;
 			double rayX = sinf(rayAngle);
@@ -429,8 +425,8 @@ void Engine::renderingConsoleGraphics()
 					else
 						cellingTexture = ' ';
 
-					screen[y * screenWidth + x].Char.UnicodeChar = cellingTexture;
-					screen[y * screenWidth + x].Attributes = 8;
+					calculationScreen[y * screenWidth + x].Char.UnicodeChar = cellingTexture;
+					calculationScreen[y * screenWidth + x].Attributes = 8;
 
 				}
 				else if (y > celling && y <= floor)
@@ -449,8 +445,8 @@ void Engine::renderingConsoleGraphics()
 					else
 						wallTexture = ' ';
 
-					if (itBound) screen[y * screenWidth + x].Attributes = 0;
-					else screen[y * screenWidth + x].Attributes = 8;
+					if (itBound) calculationScreen[y * screenWidth + x].Attributes = 0;
+					else calculationScreen[y * screenWidth + x].Attributes = 8;
 
 					if (itTeleport)
 					{
@@ -458,12 +454,12 @@ void Engine::renderingConsoleGraphics()
 						if (itBound)
 						{
 							wallTexture = ' ';
-							screen[y * screenWidth + x].Attributes = 56;
+							calculationScreen[y * screenWidth + x].Attributes = 56;
 						}
 						else
 						{
 							wallTexture = L'↑';
-							screen[y * screenWidth + x].Attributes = 3;
+							calculationScreen[y * screenWidth + x].Attributes = 3;
 						}
 					}
 					else
@@ -471,10 +467,10 @@ void Engine::renderingConsoleGraphics()
 						if (itBound)
 						{
 							wallTexture = ' ';
-							screen[y * screenWidth + x].Attributes = 8;
+							calculationScreen[y * screenWidth + x].Attributes = 8;
 						}
 					}
-					screen[y * screenWidth + x].Char.UnicodeChar = wallTexture;
+					calculationScreen[y * screenWidth + x].Char.UnicodeChar = wallTexture;
 				}
 				else
 				{
@@ -491,14 +487,15 @@ void Engine::renderingConsoleGraphics()
 					else
 						floorTexture = ' ';
 
-					screen[y * screenWidth + x].Char.UnicodeChar = floorTexture;
-					screen[y * screenWidth + x].Attributes = 8;
+					calculationScreen[y * screenWidth + x].Char.UnicodeChar = floorTexture;
+					calculationScreen[y * screenWidth + x].Attributes = 8;
 				}
 			}
 		}
-		checkPlayerInTeleport();
 		outputInfo();
-		WriteConsoleOutput(console, screen, bufferSize, { 0,0 }, &windowSize);
+		screen = calculationScreen;
+		checkPlayerInTeleport();
+
 	}
 }
 void Engine::Run()
@@ -516,9 +513,32 @@ void Engine::Run()
 	cursoreVisibleFalse();
 	getConsoleSize();
 	setScreenSize();
-	//PrintGameTitle(screenWidth, screenHeight);
+	PrintGameTitle(screenWidth, screenHeight);
 
 	screen = new CHAR_INFO[screenWidth * screenHeight];
+	thread dravingFrame([this]() {
+		while (true)
+		{
+			//this_thread::sleep_for(chrono::microseconds(100));
+			WriteConsoleOutput(console, screen, bufferSize, { 0,0 }, &windowSize);
+		}
+		});
 
+	thread infoKey([this]() {
+		while (true)
+		{
+			if (_kbhit()) {
+				switch (_getwch()) {
+				case 109: printMinimap = printMinimap ? false : true;
+					break;
+				case 27: settings();
+					break;
+				}
+				cursoreVisibleFalse();
+			}
+		}
+		});
 	renderingConsoleGraphics();
+	dravingFrame.detach();
+	infoKey.detach();
 }

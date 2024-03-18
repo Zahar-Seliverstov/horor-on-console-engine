@@ -17,6 +17,7 @@ public:
 	COORD bufferSize;
 	SMALL_RECT windowSize;
 	CHAR_INFO* screen;
+	CHAR_INFO* calculationScreen;
 	int screenWidth;
 	int screenHeight;
 

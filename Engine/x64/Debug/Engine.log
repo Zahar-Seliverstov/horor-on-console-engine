@@ -1,0 +1,7 @@
+﻿  Engine.cpp
+C:\Users\Seliv_zh92\source\repos\ZaharSilverhend\ConsoleEngine\Engine\Engine.cpp(164,39): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Seliv_zh92\source\repos\ZaharSilverhend\ConsoleEngine\Engine\Engine.cpp(361,23): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\Users\Seliv_zh92\source\repos\ZaharSilverhend\ConsoleEngine\Engine\Engine.cpp(362,23): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\Users\Seliv_zh92\source\repos\ZaharSilverhend\ConsoleEngine\Engine\Engine.cpp(405,16): warning C4244: инициализация: преобразование "float" в "int", возможна потеря данных
+C:\Users\Seliv_zh92\source\repos\ZaharSilverhend\ConsoleEngine\Engine\Engine.cpp(453,15): warning C4101: teleportTexture: неиспользованная локальная переменная
+  Engine.vcxproj -> C:\Users\Seliv_zh92\source\repos\ZaharSilverhend\ConsoleEngine\x64\Debug\Engine.exe
