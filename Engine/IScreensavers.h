@@ -1,5 +1,5 @@
 #pragma once
 
 void initialScreensaver();
-void PrintGameTitle(int& screenWidth, int& screenHeight);
-void DownloadScreensaver(int& screenWidth, int& screenHeight);
+void printGameTitle(int& screenWidth, int& screenHeight);
+void downloadScreensaver(int& screenWidth, int& screenHeight);

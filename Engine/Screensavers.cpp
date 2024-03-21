@@ -18,7 +18,7 @@ void initialScreensaver()
 		key = _getch();
 	}
 }
-void PrintGameTitle(int& screenWidth, int& screenHeight)
+void printGameTitle(int& screenWidth, int& screenHeight)
 {
 	system("cls");
 	string line = "";
@@ -61,7 +61,7 @@ void PrintGameTitle(int& screenWidth, int& screenHeight)
 	}
 	this_thread::sleep_for(chrono::milliseconds(1000));
 }
-void DownloadScreensaver(int& screenWidth, int& screenHeight)
+void downloadScreensaver(int& screenWidth, int& screenHeight)
 {
 	string path = "animationPortal.txt";
 	ifstream file(path);

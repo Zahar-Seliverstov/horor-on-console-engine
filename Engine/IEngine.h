@@ -12,12 +12,12 @@ private:
 	void outputInfo();
 	void settings();
 	void renderingConsoleGraphics();
+	bool settingsOpen;
 public:
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 	COORD bufferSize;
 	SMALL_RECT windowSize;
 	CHAR_INFO* screen;
-	CHAR_INFO* calculationScreen;
 	int screenWidth;
 	int screenHeight;
 
@@ -29,6 +29,7 @@ public:
 	double fov;
 	bool gameOver;
 	bool printMinimap;
+	bool calculateFrame;
 	
 	Engine();
 	void Run();
