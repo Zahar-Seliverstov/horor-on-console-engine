@@ -26,19 +26,21 @@ Engine::Engine()
 	fov = 3.14159f / 2;
 	gameOver = false;
 	printMinimap = false;
+	playerGoNextLevel = false;
+	settingsIsOpen = false;
+	frameBuilding = true;
 }
 void Engine::checkPlayerInTeleport()
 {
 	if (int(player.x) == mapInfo.finishCoordinat.first
 		&& int(player.y) == mapInfo.finishCoordinat.second)
 	{
-		/*mapInfo.createmap();
-		player.x = mapInfo.startCoordinat.first;
-		player.y = mapInfo.startCoordinat.second;*/
+		playerGoNextLevel = true;
 		system("cls");
 		DownloadScreensaver(screenWidth, screenHeight);
 		system("cls");
 		Run();
+		playerGoNextLevel = false;
 	}
 }
 void Engine::getConsoleSize()
@@ -267,7 +269,7 @@ void Engine::settings()
 		}
 		break;
 	case 3://	ПОЛЕ ЗРЕНИЯ
-		
+
 		while (treker) {
 			printf("\x1b[%d;%dH", startY - 3, startX - 14);
 			printf("\x1b[0m___ Настройки поля зрения ___\n\n\x1b[0m");
@@ -340,171 +342,162 @@ void Engine::settings()
 }
 void Engine::renderingConsoleGraphics()
 {
-	while (!gameOver) {
-		mapInfo.clearmap();
-		timeFinish = chrono::high_resolution_clock::now();
-		timeInSeconds = chrono::duration<double>(timeFinish - timeStart).count();
-		timeStart = chrono::high_resolution_clock::now();
-		player.motion(mapInfo.map, mapInfo.mapSizeHorizontal, timeInSeconds);
-		if (_kbhit()) {
-			/*thread gg(isPlaySound);
-			gg.join();*/
-			switch (_getwch()) {
-			case 109: printMinimap = printMinimap ? false : true;
-				break;
-			case 27: settings();
-				break;
-			}
-			cursoreVisibleFalse();
-		}
-		else {
+	while (!gameOver)
+	{
+		if (!settingsIsOpen && !playerGoNextLevel)
+		{
+			frameBuilding = true;
+			timeFinish = chrono::high_resolution_clock::now();
+			timeInSeconds = chrono::duration<double>(timeFinish - timeStart).count();
+			timeStart = chrono::high_resolution_clock::now();
+			mapInfo.clearmap();
+			player.motion(mapInfo.map, mapInfo.mapSizeHorizontal, timeInSeconds);
+			for (int x = 0; x < screenWidth; x++) {
+				double rayAngle = player.r + fov / 2.0f - x * fov / screenWidth;
+				double rayX = sinf(rayAngle);
+				double rayY = cosf(rayAngle);
+				double distanceWall = 0;
+				bool itWall = false;
+				bool itTeleport = false;
+				bool itMonster = false;
+				bool itBound = false;
 
-		}
-		for (int x = 0; x < screenWidth; x++) {
-			double rayAngle = player.r + fov / 2.0f - x * fov / screenWidth;
-			double rayX = sinf(rayAngle);
-			double rayY = cosf(rayAngle);
-			double distanceWall = 0;
-			bool itWall = false;
-			bool itTeleport = false;
-			bool itMonster = false;
-			bool itBound = false;
+				while (!itWall && distanceWall < levelDrawing) {
+					distanceWall += 0.01f;
+					int testX = (int)(player.x + rayX * distanceWall);
+					int testY = (int)(player.y + rayY * distanceWall);
 
-			while (!itWall && distanceWall < levelDrawing) {
-				distanceWall += 0.01f;
-				int testX = (int)(player.x + rayX * distanceWall);
-				int testY = (int)(player.y + rayY * distanceWall);
-
-				if (mapInfo.map[testY * mapInfo.mapSizeHorizontal + testX] == L'&') { itTeleport = true; }
-				if (testX < 0 || testX >= mapInfo.mapSizeHorizontal || testY < 0 || testY >= mapInfo.mapSizeVertical) {
-					itWall = true;
-					distanceWall = levelDrawing;
-				}
-				else if (mapInfo.map[testY * mapInfo.mapSizeHorizontal + testX] == L'#' || itTeleport) {
-					itWall = true;
-					vector<pair<double, double>> boundsVector;
-					for (int tx = 0; tx < 2; tx++) {
-						for (int ty = 0; ty < 2; ty++) {
-							double vectorX = testX + tx - player.x;
-							double vectorY = testY + ty - player.y;
-							double vectorModule = sqrt(vectorX * vectorX + vectorY * vectorY);
-							double cosAngle = rayX * vectorX / vectorModule + rayY * vectorY / vectorModule;
-							boundsVector.push_back(make_pair(vectorModule, cosAngle));
+					if (mapInfo.map[testY * mapInfo.mapSizeHorizontal + testX] == L'&') { itTeleport = true; }
+					if (testX < 0 || testX >= mapInfo.mapSizeHorizontal || testY < 0 || testY >= mapInfo.mapSizeVertical) {
+						itWall = true;
+						distanceWall = levelDrawing;
+					}
+					else if (mapInfo.map[testY * mapInfo.mapSizeHorizontal + testX] == L'#' || itTeleport) {
+						itWall = true;
+						vector<pair<double, double>> boundsVector;
+						for (int tx = 0; tx < 2; tx++) {
+							for (int ty = 0; ty < 2; ty++) {
+								double vectorX = testX + tx - player.x;
+								double vectorY = testY + ty - player.y;
+								double vectorModule = sqrt(vectorX * vectorX + vectorY * vectorY);
+								double cosAngle = rayX * vectorX / vectorModule + rayY * vectorY / vectorModule;
+								boundsVector.push_back(make_pair(vectorModule, cosAngle));
+							}
+						}
+						sort(boundsVector.begin(), boundsVector.end(), [&](const pair<double, double>& point1, const pair<double, double>& point2) {
+							double module1 = sqrt(point1.first * point1.first + point1.second * point1.second);
+							double module2 = sqrt(point2.first * point2.first + point2.second * point2.second);
+							return module1 < module2;
+							});
+						double boundAngle = 0.03 / distanceWall;
+						if ((acos(boundsVector[0].second) < boundAngle && distanceWall > 0.5)
+							|| (acos(boundsVector[1].second) < boundAngle && distanceWall > 0.5)) {
+							itBound = true;
 						}
 					}
-					sort(boundsVector.begin(), boundsVector.end(), [&](const pair<double, double>& point1, const pair<double, double>& point2) {
-						double module1 = sqrt(point1.first * point1.first + point1.second * point1.second);
-						double module2 = sqrt(point2.first * point2.first + point2.second * point2.second);
-						return module1 < module2;
-						});
-					double boundAngle = 0.03 / distanceWall;
-					if ((acos(boundsVector[0].second) < boundAngle && distanceWall > 0.5)
-						|| (acos(boundsVector[1].second) < boundAngle && distanceWall > 0.5)) {
-						itBound = true;
-					}
+					else { mapInfo.map[testY * mapInfo.mapSizeHorizontal + testX] = '.'; }
 				}
-				else { mapInfo.map[testY * mapInfo.mapSizeHorizontal + testX] = '.'; }
-			}
 
-			int celling = (float)(screenHeight / 2.0) - screenHeight / ((float)distanceWall);
-			int floor = screenHeight - celling;
+				int celling = (float)(screenHeight / 2.0) - screenHeight / ((float)distanceWall);
+				int floor = screenHeight - celling;
 
-			for (int y = 0; y < screenHeight; y++)
-			{
-				double centerScreen = 1 - double(y - screenHeight / 2) / (screenHeight / 2);
-
-				if (y <= celling)
+				for (int y = 0; y < screenHeight; y++)
 				{
+					double centerScreen = 1 - double(y - screenHeight / 2) / (screenHeight / 2);
 
-					char cellingTexture;
-
-					if (centerScreen > 1.9f)
-						cellingTexture = '$';
-					else if (centerScreen > 1.7f)
-						cellingTexture = '#';
-					else if (centerScreen > 1.4f)
-						cellingTexture = '*';
-					else if (centerScreen > 1.15f)
-						cellingTexture = ':';
-					else
-						cellingTexture = ' ';
-
-					screen[y * screenWidth + x].Char.UnicodeChar = cellingTexture;
-					screen[y * screenWidth + x].Attributes = 8;
-
-				}
-				else if (y > celling && y <= floor)
-				{
-					wchar_t wallTexture;
-
-					if (itBound) { wallTexture = L' '; }
-					else if (distanceWall <= levelDrawing / 5)
-						wallTexture = L'█';
-					else if (distanceWall <= levelDrawing / 4)
-						wallTexture = L'▓';
-					else if (distanceWall <= levelDrawing / 3)
-						wallTexture = L'▒';
-					else if (distanceWall <= levelDrawing / 1)
-						wallTexture = L'░';
-					else
-						wallTexture = ' ';
-
-					if (itBound) screen[y * screenWidth + x].Attributes = 0;
-					else screen[y * screenWidth + x].Attributes = 8;
-
-					if (itTeleport)
+					if (y <= celling)
 					{
-						wchar_t teleportTexture;
-						if (itBound)
-						{
+						char cellingTexture;
+
+						if (centerScreen > 1.9f)
+							cellingTexture = '$';
+						else if (centerScreen > 1.7f)
+							cellingTexture = '#';
+						else if (centerScreen > 1.4f)
+							cellingTexture = '*';
+						else if (centerScreen > 1.15f)
+							cellingTexture = ':';
+						else
+							cellingTexture = ' ';
+
+						screen[y * screenWidth + x].Char.UnicodeChar = cellingTexture;
+						screen[y * screenWidth + x].Attributes = 8;
+
+					}
+					else if (y > celling && y <= floor)
+					{
+						wchar_t wallTexture;
+
+						if (itBound) { wallTexture = L' '; }
+						else if (distanceWall <= levelDrawing / 5)
+							wallTexture = L'█';
+						else if (distanceWall <= levelDrawing / 4)
+							wallTexture = L'▓';
+						else if (distanceWall <= levelDrawing / 3)
+							wallTexture = L'▒';
+						else if (distanceWall <= levelDrawing / 1)
+							wallTexture = L'░';
+						else
 							wallTexture = ' ';
-							screen[y * screenWidth + x].Attributes = 56;
+
+						if (itBound) screen[y * screenWidth + x].Attributes = 0;
+						else screen[y * screenWidth + x].Attributes = 8;
+
+						if (itTeleport)
+						{
+							wchar_t teleportTexture;
+							if (itBound)
+							{
+								wallTexture = ' ';
+								screen[y * screenWidth + x].Attributes = 56;
+							}
+							else
+							{
+								wallTexture = L'↑';
+								screen[y * screenWidth + x].Attributes = 3;
+							}
 						}
 						else
 						{
-							wallTexture = L'↑';
-							screen[y * screenWidth + x].Attributes = 3;
+							if (itBound)
+							{
+								wallTexture = ' ';
+								screen[y * screenWidth + x].Attributes = 8;
+							}
 						}
+						screen[y * screenWidth + x].Char.UnicodeChar = wallTexture;
 					}
 					else
 					{
-						if (itBound)
-						{
-							wallTexture = ' ';
-							screen[y * screenWidth + x].Attributes = 8;
-						}
+						short floorTexture;
+
+						if (centerScreen < 0.2f)
+							floorTexture = '&';
+						else if (centerScreen < 0.3f)
+							floorTexture = '#';
+						else if (centerScreen < 0.5f)
+							floorTexture = '*';
+						else if (centerScreen < 0.9f)
+							floorTexture = ':';
+						else
+							floorTexture = ' ';
+
+						screen[y * screenWidth + x].Char.UnicodeChar = floorTexture;
+						screen[y * screenWidth + x].Attributes = 8;
 					}
-					screen[y * screenWidth + x].Char.UnicodeChar = wallTexture;
-				}
-				else
-				{
-					short floorTexture;
-
-					if (centerScreen < 0.2f)
-						floorTexture = '&';
-					else if (centerScreen < 0.3f)
-						floorTexture = '#';
-					else if (centerScreen < 0.5f)
-						floorTexture = '*';
-					else if (centerScreen < 0.9f)
-						floorTexture = ':';
-					else
-						floorTexture = ' ';
-
-					screen[y * screenWidth + x].Char.UnicodeChar = floorTexture;
-					screen[y * screenWidth + x].Attributes = 8;
 				}
 			}
+			outputInfo();
+			frameBuilding = false;
+			this_thread::sleep_for(chrono::milliseconds(1));
 		}
-		checkPlayerInTeleport();
-		outputInfo();
-		WriteConsoleOutput(console, screen, bufferSize, { 0,0 }, &windowSize);
 	}
 }
 void Engine::Run()
 {
 	initialScreensaver();
 	mapInfo.createmap();
+
 	// Появление в далеке от телепорта
 	//player.x = mapInfo.startCoordinat.first;
 	//player.y = mapInfo.startCoordinat.second;
@@ -516,9 +509,54 @@ void Engine::Run()
 	cursoreVisibleFalse();
 	getConsoleSize();
 	setScreenSize();
-	//PrintGameTitle(screenWidth, screenHeight);
-
+	PrintGameTitle(screenWidth, screenHeight);
+	screen = nullptr;
+	delete[] screen;
 	screen = new CHAR_INFO[screenWidth * screenHeight];
 
+	thread playerInTeleport([&]() {
+		while (!gameOver) { checkPlayerInTeleport(); }});
+	thread keyInfo([&]() {
+		while (!gameOver)
+		{
+			if (_kbhit()) {
+				switch (_getwch()) {
+				case 109: printMinimap = printMinimap ? false : true;
+					break;
+				case 27:
+					settingsIsOpen = true;
+					settings();
+					settingsIsOpen = false;
+					break;
+				}
+				cursoreVisibleFalse();
+			}
+		}
+		});
+	thread printFrame([&]() {
+		while (!gameOver)
+		{
+			if (!frameBuilding &&
+				!settingsIsOpen && !playerGoNextLevel)
+			{
+				WriteConsoleOutput(console, screen, bufferSize, { 0,0 }, &windowSize);
+			}
+		}
+		});
+	thread playerMotion([&]() {
+		while (!gameOver)
+		{
+			if (!frameBuilding)
+			{
+				
+			}
+		}
+		});
+	if (playerGoNextLevel)
+	{
+		playerInTeleport.detach();
+		keyInfo.detach();
+		printFrame.detach();
+	}
 	renderingConsoleGraphics();
 }

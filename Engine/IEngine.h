@@ -28,6 +28,9 @@ public:
 	double fov;
 	bool gameOver;
 	bool printMinimap;
+	bool settingsIsOpen;
+	bool playerGoNextLevel;
+	bool frameBuilding;
 	
 	Engine();
 	void Run();
