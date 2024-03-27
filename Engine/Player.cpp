@@ -9,7 +9,7 @@ Player::Player()
 	speed = 4;
 	sensitivity = 5;
 }
-void Player::motion(wstring& map, const int& mapSizeHorizontal, double ratioNumberFrames)
+void Player::motion(wstring& map, const int& mapSizeHorizontal, double& ratioNumberFrames)
 {
 	if (GetAsyncKeyState('D') & 0x8000) {
 		r -= (sensitivity * 0.75f) * ratioNumberFrames;

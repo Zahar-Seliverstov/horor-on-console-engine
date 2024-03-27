@@ -7,7 +7,6 @@ void MapInfo::createDungeon()
 	bool dungeonCreated = false;
 	while (!dungeonCreated)
 	{
-		srand(time(NULL));
 		maze.clear();
 		maze.resize(mapSizeVertical, vector<int>(mapSizeHorizontal, 0));
 

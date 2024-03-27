@@ -1,7 +1,24 @@
 ﻿  Engine.cpp
-C:\Users\не-кто\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Engine.cpp(165,39): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\не-кто\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Engine.cpp(350,22): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
-C:\Users\не-кто\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Engine.cpp(351,22): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
-C:\Users\не-кто\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Engine.cpp(394,15): warning C4244: инициализация: преобразование "float" в "int", возможна потеря данных
-C:\Users\не-кто\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Engine.cpp(442,14): warning C4101: teleportTexture: неиспользованная локальная переменная
-  Engine.vcxproj -> C:\Users\не-кто\source\repos\ZaharSilverhend\horor_on_console_engine\x64\Debug\Engine.exe
+C:\Users\zahar\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Engine.cpp(166,39): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\zahar\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Engine.cpp(357,24): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\Users\zahar\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Engine.cpp(358,24): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\Users\zahar\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Engine.cpp(401,17): warning C4244: инициализация: преобразование "float" в "int", возможна потеря данных
+C:\Users\zahar\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Engine.cpp(448,16): warning C4101: teleportTexture: неиспользованная локальная переменная
+  Monster.cpp
+  Main.cpp
+C:\Users\zahar\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Main.cpp(9,12): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+  MapInfo.cpp
+  Player.cpp
+C:\Users\zahar\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Player.cpp(19,13): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\Users\zahar\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Player.cpp(20,13): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\Users\zahar\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Player.cpp(22,14): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\Users\zahar\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Player.cpp(23,14): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\Users\zahar\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Player.cpp(27,13): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\Users\zahar\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Player.cpp(28,13): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\Users\zahar\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Player.cpp(30,14): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\Users\zahar\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Player.cpp(31,14): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+  Screensavers.cpp
+C:\Users\zahar\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Screensavers.cpp(103,35): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\zahar\source\repos\ZaharSilverhend\horor_on_console_engine\Engine\Screensavers.cpp(104,37): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+  Создание кода...
+  Engine.vcxproj -> C:\Users\zahar\source\repos\ZaharSilverhend\horor_on_console_engine\x64\Debug\Engine.exe

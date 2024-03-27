@@ -12,5 +12,5 @@ public:
 	double speed;
 	float sensitivity;
 	Player();
-	void motion(wstring& map,const int& mapSizeHorizontal, double ratioNumberFrames);
+	void motion(wstring& map,const int& mapSizeHorizontal, double& ratioNumberFrames);
 };
