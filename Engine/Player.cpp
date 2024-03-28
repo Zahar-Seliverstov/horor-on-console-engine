@@ -11,9 +11,7 @@ Player::Player()
 }
 void Player::motion(wstring& map, const int& mapSizeHorizontal, double& ratioNumberFrames)
 {
-	if (GetAsyncKeyState('D') & 0x8000) {
-		r -= (sensitivity * 0.75f) * ratioNumberFrames;
-	}
+	if (GetAsyncKeyState('D') & 0x8000) r -= (sensitivity * 0.75f) * ratioNumberFrames;
 	if (GetAsyncKeyState('A') & 0x8000) r += (sensitivity * 0.75f) * ratioNumberFrames;
 	if (GetAsyncKeyState('W') & 0x8000) {
 		x += sinf(r) * speed * ratioNumberFrames;
