@@ -128,7 +128,7 @@ void Engine::openSettings()
 		"          SENSITIVITY          ",
 		"              FOV              ",
 		"          SCREEN SIZE          ",
-		"            CONTINUE           ",
+		"           CONTINUE            ",
 		"         EXIT THE GAME         " };
 
 	system("cls");
@@ -292,10 +292,13 @@ void Engine::openSettings()
 	case 4://	ЭКРАН
 		while (treker)
 		{
-			startX = screenWidth / 2;
-			startY = screenHeight / 2 - 5;
+			if (startX != screenWidth / 2 && startY != screenHeight / 2 - 5)
+			{
+				startX = screenWidth / 2;
+				startY = screenHeight / 2 - 5;
+				system("cls");
+			}
 
-			system("cls");
 			getConsoleSize();
 			printf("\x1b[%d;%dH", startY - 3, startX - 20);
 			printf("\x1b[0m____________ \x1b[0mНастройка экрана\x1b[0m ____________");
@@ -314,7 +317,7 @@ void Engine::openSettings()
 				case escape: treker = false;
 				}
 			}
-			this_thread::sleep_for(chrono::milliseconds(400));
+			//this_thread::sleep_for(chrono::milliseconds(400));
 		}
 		setScreenSize();
 		delete[] screen, screen = nullptr;
@@ -333,8 +336,6 @@ void Engine::generateFrame()
 	if (!settingsIsOpen && !playerMovedToNextFloor)
 	{
 		frameIsBuild = true;
-		endFrameGeneration = chrono::high_resolution_clock::now();
-		frameGenerationTimeInSeconds = chrono::duration<double>(endFrameGeneration - startFrameGeneration).count();
 		startFrameGeneration = chrono::high_resolution_clock::now();
 
 		for (int x = 0; x < screenWidth; x++) {
@@ -477,67 +478,68 @@ void Engine::generateFrame()
 			}
 		}
 		frameIsBuild = false;
+		endFrameGeneration = chrono::high_resolution_clock::now();
+		frameGenerationTimeInSeconds = chrono::duration<double>(endFrameGeneration - startFrameGeneration).count();
+
 	}
 }
 void Engine::start()
 {
-	screen = nullptr;
-	delete[] screen;
 	screen = new CHAR_INFO[screenWidth * screenHeight];
 
-	thread checkStatusKeyInfo([&]() {
-		while (!gameIsOver || !settingsIsOpen)
+	thread checkStatusKeyInfo([&]()
 		{
-			if (_kbhit()) {
-				switch (_getwch()) {
-				case 109: displayMap = displayMap ? false : true;
-					break;
-				case 27:
-					settingsIsOpen = true;
-					openSettings();
-					settingsIsOpen = false;
-					break;
+			while (!gameIsOver)
+			{
+				if (_kbhit() && !settingsIsOpen)
+				{
+					switch (_getwch())
+					{
+					case 109:
+						displayMap = displayMap ? false : true;
+						break;
+					case 27:
+						settingsIsOpen = true;
+						openSettings();
+						setCursoreVisible();
+						settingsIsOpen = false;
+						break;
+					}
 				}
-				setCursoreVisible();
 			}
-			mapInfo->clearmap();
-		}
+
+		});
+	thread displayFrame([&]()
+		{
+			while (!gameIsOver)
+			{
+				if (!settingsIsOpen)
+				{
+					generateInfoFrame();
+					mapInfo->clearmap();
+					WriteConsoleOutput(console, screen, consoleBufferSize, { 0,0 }, &windowSize);
+				}
+			}
 		});
 	thread generateFrame([&]() {
-		while (!gameIsOver)
-			if (!settingsIsOpen)
-				generateFrame();
-		});
-	thread generateInfoFrame([&]() {
-		while (!gameIsOver)
-			if (!settingsIsOpen)
-				generateInfoFrame();
-		});
-	thread plyerMotion([&]() {
-		while (!gameIsOver)
-			if (!settingsIsOpen && !frameIsBuild)
-				player->motion(mapInfo->map, mapInfo->mapSizeHorizontal, frameGenerationTimeInSeconds);
-		});
-	thread displayFrame([&]() {
 		while (!gameIsOver)
 		{
 			if (!settingsIsOpen)
 			{
-				WriteConsoleOutput(console, screen, consoleBufferSize, { 0,0 }, &windowSize);
+				generateFrame();
+				player->motion(mapInfo->map, mapInfo->mapSizeHorizontal, frameGenerationTimeInSeconds);
 			}
-
-		}});
+		}
+		});
 
 	while (!gameIsOver)
 	{
 		if (checkPlayerInTeleport())
 		{
 			checkStatusKeyInfo.detach();
-			generateFrame.detach();
-			generateInfoFrame.detach();
-			plyerMotion.detach();
 			displayFrame.detach();
-			break;
+			generateFrame.detach();
+			gameIsOver = true;
 		}
 	}
 }
