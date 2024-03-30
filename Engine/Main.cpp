@@ -1,17 +1,37 @@
 #include "Library.h"
-#include "IEngine.h"
 #include "IScreensavers.h"
+#include "IMapInfo.h"
+#include "IPlayer.h"
+#include "IEngine.h"
+
+MapInfo mapInfo;
+Player player;
+Engine engine(player, mapInfo);
+int numberFloor = 0;
+
+void generateInitialFloor()
+{
+	cout << "Map is generating. . .";
+	mapInfo.createmap();
+	initialScreensaver();
+
+	player.x = mapInfo.finishCoordinat.first + 1;
+	player.y = mapInfo.finishCoordinat.second + 1;
+
+	engine.getConsoleSize();
+	engine.setScreenSize();
+
+	engine.setCursoreVisible();
+	//PrintGameTitle(engine.screenWidth, engine.screenHeight);
+	engine.start();
+}
 
 int main()
 {
 	setlocale(LC_ALL, "rus");
+	system("chcp 1251");
 	srand(time(NULL));
 
-	Engine engine;	// Создание обьекта класса Engin который является основным для отрисовки в консоль 
-	engine.Run();	// Вызываем у этого обьекта метод Run что бы запустить вычисления 
-	/*for (size_t i = 0; i < 256; i++)
-	{
-		cout << i << " : " << char(i) << endl; 
-	}*/
+	generateInitialFloor();
 	return 0;
 }
