@@ -28,9 +28,6 @@
     <Filter Include="Исходные файлы\Helpers">
       <UniqueIdentifier>{6e494833-9977-4424-bbeb-ae7067053660}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Исходные файлы\Helpers\Sounds">
-      <UniqueIdentifier>{ed75fbd0-35f4-4906-a762-120d27c6cedb}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -56,9 +53,6 @@
     <ClInclude Include="IEngine.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="Library.h">
-      <Filter>Файлы заголовков\Other</Filter>
-    </ClInclude>
     <ClInclude Include="IMonster.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
@@ -69,7 +63,10 @@
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="IScreensavers.h">
-      <Filter>Файлы заголовков\Other</Filter>
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Library.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

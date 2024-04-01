@@ -10,6 +10,8 @@ public:
 	double y;
 	double r;
 	double speed;
+	double amountEnergy;
+	double initialAmountEnergy;
 	float sensitivity;
 	double initialSpeed;
 	bool run;

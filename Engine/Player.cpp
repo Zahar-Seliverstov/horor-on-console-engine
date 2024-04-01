@@ -9,6 +9,8 @@ Player::Player()
 	speed = 4;
 	initialSpeed = speed;
 	sensitivity = 5;
+	amountEnergy = 100;
+	initialAmountEnergy = amountEnergy;
 }
 void Player::motion(wstring& map, const int& mapSizeHorizontal, double& ratioNumberFrames)
 {

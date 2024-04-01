@@ -17,7 +17,7 @@ public:
 	void generateFrame();
 
 	MapInfo* mapInfo;
-	Player* player;
+	Player* playerInfo;
 	HANDLE console;
 	COORD consoleBufferSize;
 	SMALL_RECT windowSize;
@@ -35,5 +35,6 @@ public:
 	bool settingsIsOpen;
 	bool playerMovedToNextFloor;
 	bool frameIsBuild;
+	bool frameInfoIsBuild;
 	
 };

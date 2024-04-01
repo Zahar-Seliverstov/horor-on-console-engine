@@ -4,9 +4,9 @@
 #include "IEngine.h"
 #include "IScreensavers.h"
 
-Engine::Engine(Player& _player, MapInfo& _mapInfo)
+Engine::Engine(Player& _playerInfo, MapInfo& _mapInfo)
 {
-	player = &_player;
+	playerInfo = &_playerInfo;
 	mapInfo = &_mapInfo;
 	startFrameGeneration = chrono::high_resolution_clock::now();
 	endFrameGeneration = chrono::high_resolution_clock::now();
@@ -21,8 +21,8 @@ Engine::Engine(Player& _player, MapInfo& _mapInfo)
 }
 bool Engine::checkPlayerInTeleport()
 {
-	if (int(player->x) == mapInfo->finishCoordinat.first
-		&& int(player->y) == mapInfo->finishCoordinat.second)
+	if (int(playerInfo->x) == mapInfo->finishCoordinat.first
+		&& int(playerInfo->y) == mapInfo->finishCoordinat.second)
 		return true;
 	return false;
 }
@@ -56,30 +56,52 @@ void Engine::setCursoreVisible()
 }
 void Engine::generateInfoFrame()
 {
-	mapInfo->clearmap();
 	std::wstringstream stream;
 	int frames = int(1 / frameGenerationTimeInSeconds);
 	stream << L"[ FPS: " << frames
 		<< (frames < 10 ? L"   ]" :
 			(frames >= 10 && frames < 100) ? L"  ]" :
 			(frames >= 100 && frames < 1000) ? L" ]" : L"]")
-		<< L" [ X: " << std::fixed << std::setprecision(1) << player->x
-		<< (player->x < 10 ? L"   ]" :
-			(player->x < 100 && player->x >= 10 ? L"  ]" :
-				(player->x < 1000 && player->x >= 100 ? L" ]" : L"]")))
-		<< L" [ Y: " << std::fixed << std::setprecision(1) << player->y
-		<< (player->y < 10 ? L"   ]" :
-			(player->y < 100 && player->y >= 10 ? L"  ]" :
-				(player->y < 1000 && player->y >= 100 ? L" ]" : L"]")));
+		<< L" [ X: " << std::fixed << std::setprecision(1) << playerInfo->x
+		<< (playerInfo->x < 10 ? L"   ]" :
+			(playerInfo->x < 100 && playerInfo->x >= 10 ? L"  ]" :
+				(playerInfo->x < 1000 && playerInfo->x >= 100 ? L" ]" : L"]")))
+		<< L" [ Y: " << std::fixed << std::setprecision(1) << playerInfo->y
+		<< (playerInfo->y < 10 ? L"   ]" :
+			(playerInfo->y < 100 && playerInfo->y >= 10 ? L"  ]" :
+				(playerInfo->y < 1000 && playerInfo->y >= 100 ? L" ]" : L"]")))
+		<< L"  SPEED: " << "[ " << playerInfo->speed << " ]"
+		<< L" RUN: " << (playerInfo->run ? L"[ true  ] " : L"[ false ] ");
 	wstring fpsString = stream.str();
-	wstring minimap = L" ~ map ~ ";
+	wstring minimap = L" ~ MAP ~ ";
+	wstring energyInfo = L" ENERGY";
+	wstring energyTexture = L"";
 	wstring hpTexture = L"";
-	wstring hp = L" ~ HP ~ ";
-	for (int i = 0; i <= player->initialHp; i += player->initialHp / 10)
+	wstring hp = L" HEALTH";
+
+	for (int x = 0; x < playerInfo->initialAmountEnergy; x += playerInfo->initialAmountEnergy / 10)
 	{
-		if (i <= player->hp) hpTexture += L" |█|";
+		if (x <= playerInfo->amountEnergy) energyTexture += L" ▒✦▒";
+		else energyTexture += L" ░✧░";
+	}
+	for (int x = 0; x < energyTexture.length(); x++)
+	{
+		int value = screenWidth * (screenHeight - 2) + energyInfo.length();
+		screen[value + x].Char.UnicodeChar = energyTexture[x];
+		screen[x + value].Attributes = 6;
+	}
+
+	for (int i = 0; i < playerInfo->initialHp; i += playerInfo->initialHp / 10)
+	{
+		if (i <= playerInfo->hp) hpTexture += L" ▒❤︎▒";
 		//\u2665
-		else hpTexture += L" |░|";
+		else hpTexture += L" ▒░░▒";
+	}
+	for (int i = 0; i < energyInfo.length(); i++)
+	{
+		int value = screenWidth * (screenHeight - 2);
+		screen[i + value].Char.UnicodeChar = energyInfo[i];
+		screen[i + value].Attributes = 15;
 	}
 	if (displayFps)
 	{
@@ -91,17 +113,19 @@ void Engine::generateInfoFrame()
 	}
 	for (int i = 0; i < hp.length(); i++)
 	{
-		screen[i + screenWidth * (screenHeight - 2)].Char.UnicodeChar = hp[i];
-		screen[i + screenWidth * (screenHeight - 2)].Attributes = 7;
+		screen[i + screenWidth * (screenHeight - 1)].Char.UnicodeChar = hp[i];
+		screen[i + screenWidth * (screenHeight - 1)].Attributes = 15;
 	}
 	for (int i = 0; i < hpTexture.size(); i++)
 	{
-		screen[i + screenWidth * (screenHeight - 1)].Char.UnicodeChar = hpTexture[i];
-		if (i % 2 == 0) screen[i + screenWidth * (screenHeight - 1)].Attributes = 4;
-		else screen[i + screenWidth * (screenHeight - 1)].Attributes = 15;
+		int value = screenWidth * (screenHeight - 1) + hp.length();
+		screen[i + value].Char.UnicodeChar = hpTexture[i];
+		if (i % 2 == 0) screen[i + value].Attributes = 4;
+		else screen[i + value].Attributes = 4;
 	}
 	if (displayMap)
 	{
+		frameInfoIsBuild = true;
 		for (int i = 0; i < minimap.size(); ++i)
 		{
 			screen[i + screenWidth * 2].Char.UnicodeChar = minimap[i];
@@ -117,18 +141,19 @@ void Engine::generateInfoFrame()
 					screen[(y + 3) * screenWidth + x].Attributes = 15;
 				}
 			}
-		if (player->y < screenHeight - 3
-			&& player->x < screenWidth - 3
+		if (playerInfo->y < screenHeight - 3
+			&& playerInfo->x < screenWidth - 3
 			&& mapInfo->finishCoordinat.first < screenWidth - 3
 			&& mapInfo->finishCoordinat.second < screenHeight - 3)
 		{
-			screen[((int)player->y + 3) * screenWidth + (int)player->x].Char.UnicodeChar = L'P';
-			screen[((int)player->y + 3) * screenWidth + (int)player->x].Attributes = 10;
+			screen[((int)playerInfo->y + 3) * screenWidth + (int)playerInfo->x].Char.UnicodeChar = L'☻';
+			screen[((int)playerInfo->y + 3) * screenWidth + (int)playerInfo->x].Attributes = 10;
 			screen[(mapInfo->startCoordinat.second + 3) * screenWidth + (mapInfo->startCoordinat.first)].Char.UnicodeChar = ' ';
 			screen[(mapInfo->startCoordinat.second + 3) * screenWidth + (mapInfo->startCoordinat.first)].Attributes = 5;
-			screen[(mapInfo->finishCoordinat.second + 3) * screenWidth + (mapInfo->finishCoordinat.first)].Char.UnicodeChar = 'F';
+			screen[(mapInfo->finishCoordinat.second + 3) * screenWidth + (mapInfo->finishCoordinat.first)].Char.UnicodeChar = L'✡︎';
 			screen[(mapInfo->finishCoordinat.second + 3) * screenWidth + (mapInfo->finishCoordinat.first)].Attributes = 9;
 		}
+		frameInfoIsBuild = false;
 	}
 }
 void Engine::openSettings()
@@ -207,13 +232,13 @@ void Engine::openSettings()
 		}
 		break;
 	case 1://	CКОРОСТЬ
-		player->speed = player->initialSpeed;
+		playerInfo->speed = playerInfo->initialSpeed;
 		while (treker)
 		{
 			printf("\x1b[%d;%dH", startY - 3, startX - 15);
 			printf("\x1b[0m______Настройки скорости______\n\n\x1b[0m");
 			printf("\x1b[%d;%dH", startY - 1, startX - 15);
-			for (int i = 1; i <= player->speed; i++) {
+			for (int i = 1; i <= playerInfo->speed; i++) {
 				if (i < 3) printf("\x1b[91m");
 				else if (i < 4)  printf("\x1b[38;5;208m");
 				else if (i < 6) printf("\x1b[92m");
@@ -231,22 +256,22 @@ void Engine::openSettings()
 
 			switch (_getwch())
 			{
-			case arrowLeft: player->speed = player->speed - 1 >= 1 ? player->speed -= 1 : 8;
+			case arrowLeft: playerInfo->speed = playerInfo->speed - 1 >= 1 ? playerInfo->speed -= 1 : 8;
 				break;
-			case arrowRight: player->speed = player->speed + 1 <= 8 ? player->speed += 1 : 1;
+			case arrowRight: playerInfo->speed = playerInfo->speed + 1 <= 8 ? playerInfo->speed += 1 : 1;
 				break;
 			case escape: treker = false;
 				break;
 			}
 		}
-		player->initialSpeed = player->speed;
+		playerInfo->initialSpeed = playerInfo->speed;
 		break;
 	case 2://	ЧУВСТВИТЕЛЬНОСТЬ
 		while (treker) {
 			printf("\x1b[%d;%dH", startY - 3, startX - 16);
 			printf("\x1b[0m___Настройки чувствительности___\x1b[0m\n");
 			printf("\x1b[%d;%dH", startY - 1, startX - 16);
-			for (double i = 1; i <= player->sensitivity; i += 1) {
+			for (double i = 1; i <= playerInfo->sensitivity; i += 1) {
 				if (i < 3) printf("\x1b[91m");
 				else if (i < 4) printf("\x1b[38;5;208m");
 				else if (i < 7) printf("\x1b[92m");
@@ -263,9 +288,9 @@ void Engine::openSettings()
 			printf("\x1b[90m <== { \x1b[0mesc\x1b[90m }");
 
 			switch (_getwch()) {
-			case arrowLeft: player->sensitivity = player->sensitivity - 1 >= 1 ? player->sensitivity -= 1 : 10;
+			case arrowLeft: playerInfo->sensitivity = playerInfo->sensitivity - 1 >= 1 ? playerInfo->sensitivity -= 1 : 10;
 				break;
-			case arrowRight: player->sensitivity = player->sensitivity + 1 <= 10 ? player->sensitivity += 1 : 1;
+			case arrowRight: playerInfo->sensitivity = playerInfo->sensitivity + 1 <= 10 ? playerInfo->sensitivity += 1 : 1;
 				break;
 			case escape: treker = false;
 				break;
@@ -351,23 +376,26 @@ void Engine::generateFrame()
 	if (!settingsIsOpen && !playerMovedToNextFloor)
 	{
 		frameIsBuild = true;
+		mapInfo->clearmap();
 		startFrameGeneration = chrono::high_resolution_clock::now();
 
 		for (int x = 0; x < screenWidth; x++) {
-			double rayAngle = player->r + fov / 2.0f - x * fov / screenWidth;
+			double rayAngle = playerInfo->r + fov / 2.0f - x * fov / screenWidth;
 			double rayX = sinf(rayAngle);
 			double rayY = cosf(rayAngle);
 			double distanceWall = 0;
 			bool itWall = false;
 			bool itTeleport = false;
+			bool itRestoringHealth = false;
 			bool itMonster = false;
 			bool itBound = false;
 
 			while (!itWall && distanceWall < drawingRange) {
 				distanceWall += 0.01f;
-				int testX = (int)(player->x + rayX * distanceWall);
-				int testY = (int)(player->y + rayY * distanceWall);
+				int testX = (int)(playerInfo->x + rayX * distanceWall);
+				int testY = (int)(playerInfo->y + rayY * distanceWall);
 
+				if (mapInfo->map[testY * mapInfo->mapSizeHorizontal + testX] == L'*') { itRestoringHealth = true; }
 				if (mapInfo->map[testY * mapInfo->mapSizeHorizontal + testX] == L'&') { itTeleport = true; }
 				if (testX < 0 || testX >= mapInfo->mapSizeHorizontal || testY < 0 || testY >= mapInfo->mapSizeVertical) {
 					itWall = true;
@@ -378,8 +406,8 @@ void Engine::generateFrame()
 					vector<pair<double, double>> boundsVector;
 					for (int tx = 0; tx < 2; tx++) {
 						for (int ty = 0; ty < 2; ty++) {
-							double vectorX = testX + tx - player->x;
-							double vectorY = testY + ty - player->y;
+							double vectorX = testX + tx - playerInfo->x;
+							double vectorY = testY + ty - playerInfo->y;
 							double vectorModule = sqrt(vectorX * vectorX + vectorY * vectorY);
 							double cosAngle = rayX * vectorX / vectorModule + rayY * vectorY / vectorModule;
 							boundsVector.push_back(make_pair(vectorModule, cosAngle));
@@ -405,11 +433,13 @@ void Engine::generateFrame()
 			for (int y = 0; y < screenHeight; y++)
 			{
 				double centerScreen = 1 - double(y - screenHeight / 2) / (screenHeight / 2);
-				if ((displayFps ? (x > 37 || y != 0) : true)
-					&& (y != screenHeight - 1 || x > 43)
-					&& (y != screenHeight - 2 || x > 7)
-					&& (displayMap ? (x > (mapInfo->mapSizeHorizontal - 1)
-						|| (y < 3 || y >(mapInfo->mapSizeVertical + 2))) : true))
+				if ((displayFps ? (x > 69 || y != 0) : true)	//	FPS
+					&& (y != screenHeight - 1 || x > 56)		//	HP
+					&& (y != screenHeight - 2 || x > 46)		//	ENERGY
+					&& (displayMap ?							//	MAP
+						(x > (mapInfo->mapSizeHorizontal - 1)
+							|| (y < 3 || y >(mapInfo->mapSizeVertical + 2))
+							&& (y != 2 || x > 8)) : true))
 				{
 					if (y <= celling)
 					{
@@ -433,9 +463,7 @@ void Engine::generateFrame()
 					else if (y > celling && y <= floor)
 					{
 						wchar_t wallTexture;
-
-						if (itBound) { wallTexture = L' '; }
-						else if (distanceWall <= drawingRange / 5)
+						if (distanceWall <= drawingRange / 5)
 							wallTexture = L'█';
 						else if (distanceWall <= drawingRange / 4)
 							wallTexture = L'▓';
@@ -454,20 +482,20 @@ void Engine::generateFrame()
 							wchar_t teleportTexture;
 							if (itBound)
 							{
-								wallTexture = ' ';
-								screen[y * screenWidth + x].Attributes = 56;
+								wallTexture = L' ';
+								screen[y * screenWidth + x].Attributes = 15;
 							}
 							else
 							{
-								wallTexture = L'↑';
-								screen[y * screenWidth + x].Attributes = 3;
+								wallTexture = (rand() % 10) % 3 == 0 ? L' ' : L'✦';
+								screen[y * screenWidth + x].Attributes = (rand() % 10) % 5 == 0 ? 15 : 5;
 							}
 						}
 						else
 						{
 							if (itBound)
 							{
-								wallTexture = ' ';
+								wallTexture = L' ';
 								screen[y * screenWidth + x].Attributes = 8;
 							}
 						}
@@ -502,7 +530,6 @@ void Engine::generateFrame()
 void Engine::start()
 {
 	screen = new CHAR_INFO[screenWidth * screenHeight];
-
 	thread statusKeyInfo([&]()
 		{
 			while (!gameIsOver)
@@ -524,12 +551,37 @@ void Engine::start()
 						settingsIsOpen = false;
 						break;
 					case 32:
-						player->run = player->run ? false : true;
-						player->run ? player->speed = player->initialSpeed : player->speed += 2;
+						playerInfo->run = !playerInfo->run ? true : false;
+						!playerInfo->run || playerInfo->amountEnergy == 0 ? playerInfo->speed = playerInfo->initialSpeed : playerInfo->speed += 2;
+						break;
 					}
+
 				}
 			}
 
+		});
+	thread checkEnergyInfo([&]() {
+		while (!gameIsOver)
+		{
+			if (playerInfo->run)
+			{
+				while (playerInfo->amountEnergy >= 0 && playerInfo->run)
+				{
+					playerInfo->amountEnergy -= playerInfo->initialAmountEnergy / 10;
+					this_thread::sleep_for(chrono::milliseconds(200));
+				}
+				playerInfo->speed = playerInfo->initialSpeed;
+				playerInfo->run = false;
+			}
+			if (!playerInfo->run)
+			{
+				while (playerInfo->amountEnergy < playerInfo->initialAmountEnergy && !playerInfo->run)
+				{
+					playerInfo->amountEnergy += playerInfo->initialAmountEnergy / 10;
+					this_thread::sleep_for(chrono::milliseconds(700));
+				}
+			}
+		}
 		});
 	thread displayFrameAndGenerateHelpersForFrame([&]()
 		{
@@ -538,7 +590,6 @@ void Engine::start()
 				if (!settingsIsOpen)
 				{
 					generateInfoFrame();
-					//this_thread::sleep_for(chrono::milliseconds(1));
 					WriteConsoleOutput(console, screen, consoleBufferSize, { 0,0 }, &windowSize);
 				}
 			}
@@ -549,11 +600,23 @@ void Engine::start()
 			if (!settingsIsOpen)
 			{
 				generateFrame();
-				player->motion(mapInfo->map, mapInfo->mapSizeHorizontal, frameGenerationTimeInSeconds);
+				playerInfo->motion(mapInfo->map, mapInfo->mapSizeHorizontal, frameGenerationTimeInSeconds);
 			}
 		}
 		});
-
+	thread playSoundGame([&]() {
+		vector<wstring> listSounds{
+			L"sounds/gameSound1.wav",
+			L"sounds/gameSound2.wav",
+			L"sounds/gameSound3.wav",
+			L"sounds/gameSound4.wav"
+		};
+		while (!gameIsOver)
+		{
+			PlaySound(listSounds[rand() % listSounds.size()].c_str(), NULL, SND_ASYNC);
+			this_thread::sleep_for(chrono::seconds(149));
+		}
+		});
 	while (!gameIsOver)
 	{
 		if (checkPlayerInTeleport())
@@ -561,6 +624,7 @@ void Engine::start()
 			statusKeyInfo.detach();
 			displayFrameAndGenerateHelpersForFrame.detach();
 			generateFrame.detach();
+			checkEnergyInfo.detach();
 			return;
 		}
 	}

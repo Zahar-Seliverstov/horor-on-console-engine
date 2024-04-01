@@ -201,7 +201,7 @@ wstring MapInfo::getWstringMaze()
 	return mazeString;
 }
 // стартовые координаты телепорта
-void MapInfo::setStartCoordinat()
+void MapInfo::setPlayerStartingCoordinates()
 {
 	while (true)
 	{
@@ -215,27 +215,56 @@ void MapInfo::setStartCoordinat()
 	}
 }
 // Финишные координаты телепорта
-void MapInfo::setFinishCoordinat()
+void MapInfo::setTeleportCoordinates()
 {
-	while (true)
+	int const maxAttemts = 100;
+	int attempts = 0;
+	while (attempts < maxAttemts)
 	{
 		finishCoordinat.first = rand() % (mapSizeHorizontal - 2) + 1;
 		finishCoordinat.second = rand() % (mapSizeVertical - 2) + 1;
-		if (map[finishCoordinat.second * mapSizeHorizontal + finishCoordinat.first] != '#'
-			&& abs(finishCoordinat.first - startCoordinat.first) > mapSizeHorizontal * 0.6
-			&& abs(finishCoordinat.second - startCoordinat.second) > mapSizeVertical * 0.6)
-			return;
+		if (map[finishCoordinat.second * mapSizeHorizontal + finishCoordinat.first] != '#')
+		{
+			if (abs(finishCoordinat.first - startCoordinat.first) > mapSizeHorizontal * 0.6 &&
+				abs(finishCoordinat.second - startCoordinat.second) > mapSizeVertical * 0.6)
+			{
+				return;
+			}
+		}
+		attempts++;
 	}
+	// Обработка ситуации, когда не удалось найти подходящие координаты после максимального числа попыток
+	// Здесь можно, например, сгенерировать финишные координаты без проверки условий
+
+	srand(time(nullptr)); // Инициализируем генератор случайных чисел
+	finishCoordinat.first = rand() % (mapSizeHorizontal - 2) + 1;
+	finishCoordinat.second = rand() % (mapSizeVertical - 2) + 1;
 }
+//// Финишные координаты телепорта
+//void MapInfo::setFinishCoordinat()
+//{
+//	while (true)
+//	{
+//		finishCoordinat.first = rand() % (mapSizeHorizontal - 2) + 1;
+//		finishCoordinat.second = rand() % (mapSizeVertical - 2) + 1;
+//		if (map[finishCoordinat.second * mapSizeHorizontal + finishCoordinat.first] != '#'
+//			&& abs(finishCoordinat.first - startCoordinat.first) > mapSizeHorizontal * 0.6
+//			&& abs(finishCoordinat.second - startCoordinat.second) > mapSizeVertical * 0.6)
+//			return;
+//	}
+//}
+// 
+
 // Создание карты
 void MapInfo::createmap()
 {
 	createDungeon();
 	createBorders();
 	map = getWstringMaze();
-	setStartCoordinat();
-	setFinishCoordinat();
+	setPlayerStartingCoordinates();
+	setTeleportCoordinates();
 	map[finishCoordinat.second * mapSizeHorizontal + finishCoordinat.first] = teleportSkin;
+	//map[(finishCoordinat.second + 1) * mapSizeHorizontal + (finishCoordinat.first + 2)] = L'*';
 	initialMap = map;
 }
 // Конструктор класса

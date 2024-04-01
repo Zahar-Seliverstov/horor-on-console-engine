@@ -1,7 +1,4 @@
-﻿  Engine.cpp
-C:\Users\zahar\OneDrive\Progects Visual Studio\C++\ZaharSilverhend\horor_on_console_engine\Engine\Engine.cpp(168,39): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\zahar\OneDrive\Progects Visual Studio\C++\ZaharSilverhend\horor_on_console_engine\Engine\Engine.cpp(358,23): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
-C:\Users\zahar\OneDrive\Progects Visual Studio\C++\ZaharSilverhend\horor_on_console_engine\Engine\Engine.cpp(359,23): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
-C:\Users\zahar\OneDrive\Progects Visual Studio\C++\ZaharSilverhend\horor_on_console_engine\Engine\Engine.cpp(402,16): warning C4244: инициализация: преобразование "float" в "int", возможна потеря данных
-C:\Users\zahar\OneDrive\Progects Visual Studio\C++\ZaharSilverhend\horor_on_console_engine\Engine\Engine.cpp(454,16): warning C4101: teleportTexture: неиспользованная локальная переменная
-  Engine.vcxproj -> C:\Users\zahar\OneDrive\Progects Visual Studio\C++\ZaharSilverhend\horor_on_console_engine\x64\Debug\Engine.exe
+﻿  Screensavers.cpp
+C:\Users\zahar\OneDrive\Рабочий стол\horor_on_console_engine-dev\Engine\Screensavers.cpp(119,35): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\zahar\OneDrive\Рабочий стол\horor_on_console_engine-dev\Engine\Screensavers.cpp(120,37): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+  Engine.vcxproj -> C:\Users\zahar\OneDrive\Рабочий стол\horor_on_console_engine-dev\x64\Debug\Engine.exe

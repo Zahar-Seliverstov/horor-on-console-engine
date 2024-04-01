@@ -39,8 +39,8 @@ public:
 	vector<vector<int>> getIntMaze();
 	// Метод для перевода из масива в wstring
 	wstring getWstringMaze();
-	void setStartCoordinat();
-	void setFinishCoordinat();
+	void setPlayerStartingCoordinates();
+	void setTeleportCoordinates();
 	// Создание карты
 	void createmap();
 
