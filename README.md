@@ -58,7 +58,7 @@ make build
 Этот проект был разработан совместными усилиями следующих людей:
 
 - **Zahar Seliverstov** - [@ZaharSilverhend](https://github.com/ZaharSilverhend) - Главный разработчик
-- **Rodion Ustinov** - [@Worton1720](https://github.com/Worton1720) - Разработчик
+- **Rodion Ustinov** - [@Worton1720](https://github.com/Worton1720) - Главный разработчик
 - **Maria Stelmakh** - Саунд-дизайнер
 
 ## 📝 лицензия
