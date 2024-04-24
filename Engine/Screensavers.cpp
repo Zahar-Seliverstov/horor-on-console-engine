@@ -21,6 +21,7 @@ void initialScreensaver()
 	printf("\n\n\t\x1b[90mBackwards - \x1b[0mKEY \x1b[90m<\x1b[93m S \x1b[90m>");
 	printf("\n\n\t\x1b[90mLeft - \x1b[0mKEY \x1b[90m<\x1b[93m A \x1b[90m>");
 	printf("\n\n\t\x1b[90mRight - \x1b[0mKEY \x1b[90m<\x1b[93m D \x1b[90m>");
+	printf("\n\n\t\x1b[90mRun - \x1b[0mKEY \x1b[90m<\x1b[93m SHIFT \x1b[90m>");
 	printf("\n\n\x1b[90m   # \x1b[94mSETTINGS");
 	printf("\n\n\t\x1b[90mOpen - \x1b[0mKEY \x1b[90m<\x1b[93m Esc \x1b[90m>");
 	printf("\n\n\t\x1b[90mMenu management - \x1b[0mKEY \x1b[90m< \x1b[93mARROW UP\x1b[90m,\x1b[93m DOWN\x1b[90m,\x1b[93m LEFT\x1b[90m,\x1b[93m RIGTH\x1b[90m >");
@@ -29,7 +30,7 @@ void initialScreensaver()
 	printf("\n\n\t\x1b[90mMAP - \x1b[0mKEY \x1b[90m<\x1b[93m M \x1b[90m>");
 	printf("\n\n\x1b[90m===============================================================\n\n");
 
-	while (key != 13){
+	while (key != 13) {
 		if (key == 27) { exit(0); }
 		key = _getch();
 	}
@@ -64,7 +65,7 @@ void PrintGameTitle(int& screenWidth, int& screenHeight)
 	printf("\x1b[31;48m");
 	this_thread::sleep_for(chrono::milliseconds(500));
 
-	thread playMenuSound([](){PlaySound(L"sounds/menu.wav", NULL, SND_ASYNC); });
+	thread([]() {PlaySound(L"sounds/menu.wav", NULL, SND_ASYNC); }).detach();
 
 	this_thread::sleep_for(chrono::milliseconds(200));
 	for (int i = 0; i <= 17; i++)
@@ -74,7 +75,7 @@ void PrintGameTitle(int& screenWidth, int& screenHeight)
 		cout << "\t" << nameGame[i] << endl;
 	}
 	this_thread::sleep_for(chrono::milliseconds(3100));
-	playMenuSound.detach();
+	//playMenuSound.detach();
 	//system("pause");
 }
 void DownloadScreensaver(int& screenWidth, int& screenHeight)
@@ -83,9 +84,9 @@ void DownloadScreensaver(int& screenWidth, int& screenHeight)
 	ifstream file(path);
 
 	vector<vector<string>> arr;
-
 	if (file.is_open())
 	{
+		mciSendString(L"play sounds/teleport.wav", NULL, 0, NULL);
 		string str;
 		// Считываем весь файл в одну строку
 		getline(file, str, '\0');
@@ -131,5 +132,5 @@ void DownloadScreensaver(int& screenWidth, int& screenHeight)
 		}
 	}
 	else
-		throw std::exception("Error open file");
+		throw std::exception("Error to opening file...");
 }

@@ -2,22 +2,40 @@
 #include "Library.h"
 #include "IMapInfo.h"
 #include "IPlayer.h"
+#include "IMonster.h"
+#include "IRestoringHealth.h"
+
 enum keys;
 class Engine
 {
 public:
-	Engine(Player& player, MapInfo& mapInfo);
-	void start();
-	bool checkPlayerInTeleport();
-	void getConsoleSize();
-	void setScreenSize();
-	void setCursoreVisible();
-	void generateInfoFrame();
-	void openSettings();
-	void generateFrame();
+	Engine(
+		Player& _playerInfo,
+		Monster& _monsterInfo,
+		Teleport& _teleportInfo,
+		RestoringHealth& _restoringHealthInfo,
+		RestoringEnergy& _restoringEnergyInfo,
+		MapInfo& _mapInfo);	//	Конструктор
 
+	bool mapViewBoundaryCheck(int x, int y); //	Метод для отслеживания границ увиденной карты
+	void checkPlayerUseObject();	//	Чекаем что игрок в телепорте или нет
+	void getConsoleSize();			//	Получаем размер консольного окна
+	void setScreenSize();			//	Устанавливаем размер кадра под размер консоли
+	void setCursoreVisible();		//	Устанавливаем видимость курсора
+	void generateInfoFrame();		//	Генерирует маску кадра
+	void openSettings();			//	Открытие настроик
+	void generateFrame();			//	Генерирует кадр
+	void start();					//	Запускаем движок
+
+	//	Места под обьекты с которыми может работать движок
 	MapInfo* mapInfo;
 	Player* playerInfo;
+	Monster* monsterInfo;
+	Teleport* teleportInfo;
+	RestoringHealth* restoringHealthInfo;
+	RestoringEnergy* restoringEnergyInfo;
+
+	//	Поля движка
 	HANDLE console;
 	COORD consoleBufferSize;
 	SMALL_RECT windowSize;
@@ -36,5 +54,6 @@ public:
 	bool playerMovedToNextFloor;
 	bool frameIsBuild;
 	bool frameInfoIsBuild;
+	double texturingLevel;
 	
 };

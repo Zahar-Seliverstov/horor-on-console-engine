@@ -16,57 +16,84 @@
     <Filter Include="Файлы заголовков\Interfaces">
       <UniqueIdentifier>{55a6d9f2-f15d-4804-9efb-fe39150ec9da}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Файлы заголовков\Other">
-      <UniqueIdentifier>{096c5e35-63f8-4d51-8ca4-6ecfc0c3c975}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Исходные файлы\Entities">
-      <UniqueIdentifier>{25a9f6c2-fed7-4ef6-a307-62acbff6de4b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Исходные файлы\Engine">
-      <UniqueIdentifier>{27f25975-82a7-47f9-a865-8d65e03209a9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Исходные файлы\Helpers">
       <UniqueIdentifier>{6e494833-9977-4424-bbeb-ae7067053660}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Interfaces\Interface Objects">
+      <UniqueIdentifier>{d5dbe7bc-d4ba-438d-a2d0-6320aecc87cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Interfaces\Interface Helpers">
+      <UniqueIdentifier>{725d64f1-259c-4451-b666-7b4a0d5c99bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Objects">
+      <UniqueIdentifier>{740a54f9-b3d8-4db0-9ed5-679e563c9424}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Interfaces\Interface Other">
+      <UniqueIdentifier>{9e6f7f0a-8116-49bb-b93f-9d03fbacf3d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Other">
+      <UniqueIdentifier>{aa02531c-4958-49ee-a203-a2bd0cc26842}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="MapInfo.cpp">
-      <Filter>Исходные файлы\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Исходные файлы\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="Monster.cpp">
-      <Filter>Исходные файлы\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine.cpp">
-      <Filter>Исходные файлы\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="Screensavers.cpp">
       <Filter>Исходные файлы\Helpers</Filter>
     </ClCompile>
+    <ClCompile Include="test.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="RestoringHealth.cpp">
+      <Filter>Исходные файлы\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Monster.cpp">
+      <Filter>Исходные файлы\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Исходные файлы\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Teleport.cpp">
+      <Filter>Исходные файлы\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="RestoringEnergy.cpp">
+      <Filter>Исходные файлы\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine.cpp">
+      <Filter>Исходные файлы\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>Исходные файлы\Other</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="IEngine.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IMonster.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IMapInfo.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IPlayer.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
+    <ClInclude Include="IRestoringHealth.h">
+      <Filter>Файлы заголовков\Interfaces\Interface Objects</Filter>
     </ClInclude>
     <ClInclude Include="IScreensavers.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
+      <Filter>Файлы заголовков\Interfaces\Interface Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="IPlayer.h">
+      <Filter>Файлы заголовков\Interfaces\Interface Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="IRestoringEnergy.h">
+      <Filter>Файлы заголовков\Interfaces\Interface Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="ITeleport.h">
+      <Filter>Файлы заголовков\Interfaces\Interface Objects</Filter>
     </ClInclude>
     <ClInclude Include="Library.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IEngine.h">
+      <Filter>Файлы заголовков\Interfaces\Interface Other</Filter>
+    </ClInclude>
+    <ClInclude Include="IMapInfo.h">
+      <Filter>Файлы заголовков\Interfaces\Interface Other</Filter>
+    </ClInclude>
+    <ClInclude Include="IMonster.h">
+      <Filter>Файлы заголовков\Interfaces\Interface Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

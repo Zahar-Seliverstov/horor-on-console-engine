@@ -130,15 +130,22 @@
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Monster.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MapInfo.cpp" />
+    <ClCompile Include="Map.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="RestoringEnergy.cpp" />
+    <ClCompile Include="RestoringHealth.cpp" />
     <ClCompile Include="Screensavers.cpp" />
+    <ClCompile Include="Teleport.cpp" />
+    <ClCompile Include="test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="IRestoringEnergy.h" />
+    <ClInclude Include="IRestoringHealth.h" />
     <ClInclude Include="IScreensavers.h" />
     <ClInclude Include="IEngine.h" />
     <ClInclude Include="IMonster.h" />
     <ClInclude Include="IPlayer.h" />
+    <ClInclude Include="ITeleport.h" />
     <ClInclude Include="Library.h" />
     <ClInclude Include="IMapInfo.h" />
   </ItemGroup>
