@@ -261,15 +261,33 @@ void MapInfo::createmap()
 {
 	createDungeon();
 	createBorders();
-	map = getWstringMaze();
-	mapPlayerSaw = new bool[mapSizeHorizontal * mapSizeVertical];
-	for (int x = 0; x < mapSizeHorizontal; x++) {
-		for (int y = 0; y < mapSizeVertical; y++) {
-			mapPlayerSaw[y * x] = true;
-		}
-	}
+	map = getWstringMaze();	//	Полуаем карту 
+	/*map += L"##############";
+	map += L"#            #";
+	map += L"#            #";
+	map += L"#            #";
+	map += L"#            #";
+	map += L"#            #";
+	map += L"#            #";
+	map += L"#            #";
+	map += L"#            #";
+	map += L"#            #";
+	map += L"#            #";
+	map += L"#            #";
+	map += L"#            #";
+	map += L"##############";
 
-	setPositionObject(20);
+	mapSizeHorizontal = 14;
+	mapSizeVertical = 14;*/
+
+	mapPlayerSaw = new bool[mapSizeHorizontal * mapSizeVertical];	//	Массив того что видел игрок
+
+	//	Заполняем масив изночально что бы карта была закрыта
+	for (int x = 0; x < mapSizeHorizontal; x++)
+		for (int y = 0; y < mapSizeVertical; y++)
+			mapPlayerSaw[y * x] = true;
+
+	setPositionObject(20);	//	Распологаем обьекты на карте
 	////	Устанавливаем стартовую позицию игрока на карте 
 	//setPlayerStartingCoordinates();
 
@@ -296,7 +314,6 @@ void MapInfo::createmap()
 	////	ТЕСТ спаун МОНСТРА у телепорта
 	//monsterInfo->setX(teleportInfo->getX() - 1);
 	//monsterInfo->setY(teleportInfo->getY() - 1);
-
 
 	//	СТРОГО ЗДЕСЬ
 	initialMap = map;

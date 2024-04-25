@@ -6,6 +6,9 @@
 #include "IRestoringHealth.h"
 #include "IMonster.h"
 
+
+
+int distans;
 //	Конструктор
 Engine::Engine(
 	Player& _playerInfo,
@@ -390,7 +393,8 @@ void Engine::generateInfoFrame()
 			<< L"  SPEED: " << "[ " << playerInfo->getSpeed() << " ]"
 			<< L" RUN: " << (playerInfo->getRun() ? L"[ true  ] " : L"[ false ] ")
 			<< L"GO: " << (playerInfo->getGo() ? L"[ true  ]" : L"[ false ]")
-			<< L" HEALTH: [" << playerInfo->getHp() << (playerInfo->getHp() >= 100 ? L"]" : playerInfo->getHp() == 0 ? L"  ]" : L" ]");
+			<< L" HEALTH: [" << playerInfo->getHp() << (playerInfo->getHp() >= 100 ? L"]" : playerInfo->getHp() == 0 ? L"  ]" : L" ]")
+			<< L" D: " << distans;
 	}
 	//	Отрисовываем интерфейс ( prompt the setting )
 	for (int i = 0; i < settingTexture.length(); i++) {
@@ -480,7 +484,7 @@ void Engine::generateInfoFrame()
 
 		//	Хилка
 		if (restoringHealthInfo->getX() < screenWidth
-			&& restoringHealthInfo->getY() + 3 < screenHeight 
+			&& restoringHealthInfo->getY() + 3 < screenHeight
 			&& !restoringHealthInfo->used)
 		{
 			screen[((int)restoringHealthInfo->getY() + 3) * screenWidth + (int)restoringHealthInfo->getX()].Char.UnicodeChar = L'❤';
@@ -550,7 +554,7 @@ void Engine::generateFrame()
 				testY = (int)(playerInfo->getPositionY() + rayY * distanceWall);
 				//	Проверяем что луч стлкнулся с МОНСТРОМ
 				//if (mapInfo->map[testY * mapInfo->mapSizeHorizontal + testX] == L'M') { itMonster = true; }
-				if (testY== monsterInfo->getY() && testX == monsterInfo->getX()) { itMonster = true; }
+				if (testY == monsterInfo->getY() && testX == monsterInfo->getX()) { itMonster = true; }
 				//	Проверяем что луч столкнулся с ХИЛКОЙ 
 				else if (mapInfo->map[testY * mapInfo->mapSizeHorizontal + testX] == L'H') { itRestoringHealth = true; }
 				//	Проверяем что луч столкнулся с ТЕЛЕПОРТОМ
@@ -604,7 +608,7 @@ void Engine::generateFrame()
 				int gg = 1;
 				double centerScreen = 1 - double(y - screenHeight / 2) / (screenHeight / 2);	//	Высчитываем цент экрана
 				//	Не отрисовываем где будет отрисовываться маска для кадра
-				if ((displayFps ? (x > 96 || y != 0) : true)		//	FPS
+				if ((displayFps ? (x > 106 || y != 0) : true)		//	FPS
 					&& (y != screenHeight - 1 || x > 39)			//	HP
 					&& (y != screenHeight - 2 || x > 39)			//	ENERGY
 					&& (mapViewBoundaryCheck(x, y)))				//	MAP
@@ -640,7 +644,7 @@ void Engine::generateFrame()
 						//	Текстурируем СТЕНЫ
 						else if (itWall) {
 							wchar_t wallTexture = L' ';
-							if (itBound) {screen[y * screenWidth + x].Attributes = 8;}
+							if (itBound) { screen[y * screenWidth + x].Attributes = 8; }
 							else {
 								if (distanceWall <= drawingRange / 5) { wallTexture = L'█'; }
 								else if (distanceWall <= drawingRange / 4) { wallTexture = L'▓'; }
@@ -717,22 +721,27 @@ void Engine::start()
 	screen = new CHAR_INFO[screenWidth * screenHeight];	//	Создание массива для экрана
 
 	thread monsterMovement([&]() {
-		while (!gameIsOver && !settingsIsOpen)
-		{
-			monsterInfo->movement(mapInfo->mapSizeVertical,
+		while (!gameIsOver && !settingsIsOpen) {
+			//	Движение монстра
+			monsterInfo->movement(
+				mapInfo->mapSizeVertical,
 				mapInfo->mapSizeHorizontal,
 				mapInfo->map,
-				playerInfo->x, playerInfo->y);
+				playerInfo->x,
+				playerInfo->y,
+				distans);
 
+			//	Если монстр может кдарить бьет
 			if (monsterInfo->canHit) {
 				monsterInfo->setAttributeFrontColor(4);
-				mciSendString(L"play sounds/hitPlayer2.wav", NULL, SND_ASYNC, NULL);
 				playerInfo->setHp(monsterInfo->hitPlayer(playerInfo->getHp()));
+				mciSendString(L"play sounds/hitPlayer2.wav", NULL, SND_ASYNC, NULL);
 			}
 			else monsterInfo->setAttributeFrontColor(8);
-			
-			if (playerInfo->getHp() == 0 && !frameInfoIsBuild)
-			{
+
+			//	Если игрок умер
+			if (!frameInfoIsBuild && playerInfo->getHp() == 0) {
+				this_thread::sleep_for(chrono::milliseconds(100));
 				gameIsOver = true;
 				mciSendString(L"play sounds/die.wav wait", NULL, 0, NULL);
 			}
@@ -819,7 +828,7 @@ void Engine::start()
 					//	Чекаем игрок в телепорте или нет 
 					checkPlayerUseObject();
 					//	Проигрываем звуки при нажатии на спец клавиши ( ESCAPE, F, M )
-					switch (_getwch())
+					switch (_getch())
 					{
 					case 109:
 						mciSendString(L"play sounds/buttonsInfo.wav", NULL, SND_ASYNC, 0);

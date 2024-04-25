@@ -1,8 +1,8 @@
 ﻿  Engine.cpp
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Engine.cpp(141,39): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Engine.cpp(397,13): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Engine.cpp(402,102): warning C4244: +=: преобразование "double" в "int", возможна потеря данных
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Engine.cpp(529,23): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Engine.cpp(530,23): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Engine.cpp(600,42): warning C4244: =: преобразование "float" в "int", возможна потеря данных
-  Engine.vcxproj -> D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\x64\Debug\Engine.exe
+C:\PROJECTs\Engine\Engine.cpp(144,39): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+C:\PROJECTs\Engine\Engine.cpp(401,13): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+C:\PROJECTs\Engine\Engine.cpp(406,102): warning C4244: +=: преобразование "double" в "int", возможна потеря данных
+C:\PROJECTs\Engine\Engine.cpp(533,23): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\PROJECTs\Engine\Engine.cpp(534,23): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\PROJECTs\Engine\Engine.cpp(604,42): warning C4244: =: преобразование "float" в "int", возможна потеря данных
+  Engine.vcxproj -> C:\PROJECTs\x64\Debug\Engine.exe

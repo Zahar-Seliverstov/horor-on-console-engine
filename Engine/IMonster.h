@@ -65,7 +65,9 @@ public:
 	void movement(int& mapSizeVertical,
         int& mapSizeHorizontal,
         wstring& map,
-        double playerPositionX, double playerPositionY);
+        double playerPositionX, 
+        double playerPositionY,
+        int& distans);
 
 	//	Конструктор
 	Monster(double& y, double& x);

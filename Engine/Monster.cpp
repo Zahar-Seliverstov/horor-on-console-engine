@@ -6,8 +6,6 @@
 Monster::Monster(double& _playerPositionX, double& _playerPositionY) {
 	x = 0;
 	y = 0;
-	/*playerPositionX = &_playerPositionX;
-	playerPositionY = &_playerPositionY;*/
 
 	health = 100;
 	damage = 10;
@@ -63,68 +61,181 @@ int Monster::hitPlayer(int playerHp) {
 }
 
 //	Движение
-void Monster::movement(int& mapSizeVertical,
+void Monster::movement(
+	int& mapSizeVertical,
 	int& mapSizeHorizontal,
 	wstring& map,
-	double playerPositionX, double playerPositionY)
+	double playerPositionX,
+	double playerPositionY,
+	int& distans)
 {
-	int gg = 0;
-	int px = int(playerPositionX);
-	int py = int(playerPositionY);
-	gg = abs((x + y) - (px + py));
-	if (gg <= 2) { canHit = true; }
+	//	Получаем и округляем в БОЛЬШУЮ часть координаты игрока
+	int playerX = round(playerPositionX);
+	int playerY = round(playerPositionY);
+
+	//int coordinateDifference = abs((x + y) - (playerX + playerY));
+
+
+
+	//	Вычисляем разницу между координатами игрока и монстра
+	int coordinateDifferenceX = abs(x - playerX);
+	int coordinateDifferenceY = abs(y - playerY);
+
+	// Суммируем разницу по осям
+	int totalCoordinateDifference = coordinateDifferenceX + coordinateDifferenceY;
+	distans = totalCoordinateDifference;
+
+	//	Если разница в координатах позволяет ударить то бьем
+	if (totalCoordinateDifference <= 3) canHit = true;
 	else { canHit = false; }
 
-	//	Ходьба монстра ЗА ИГРОКОМ
-	if (gg <= 10) {
-		mciSendString(L"play sounds/moveWall.wav", NULL, SND_ASYNC, NULL);
-		if (px > x) { x += 1; }
-		if (px < x) { x -= 1; }
-		if (py > y) { y += 1; }
-		if (py < y) { y -= 1; }
+	//	Ходьба монстра за ИГРОКОМ
+		//	Устанавливаем радиус поиска игрока
+	if (int(totalCoordinateDifference) <= 10.0f) {
+		//	Звук движения
+		if ((x + 1) <= mapSizeHorizontal
+			&& playerPositionX > x) {
+			mciSendString(L"play sounds/moveWall.wav", NULL, SND_ASYNC, NULL);
+			x += 1;
+		}
+		if ((x - 1) >= 0
+			&& playerPositionX < x) {
+			mciSendString(L"play sounds/moveWall.wav", NULL, SND_ASYNC, NULL);
+			x -= 1;
+		}
+		if ((y + 1) <= mapSizeVertical
+			&& playerPositionY > y) {
+			mciSendString(L"play sounds/moveWall.wav", NULL, SND_ASYNC, NULL);
+			y += 1;
+		}
+		if ((y - 1) >= 0
+			&& playerPositionY < y) {
+			mciSendString(L"play sounds/moveWall.wav", NULL, SND_ASYNC, NULL);
+			y -= 1;
+		}
 		this_thread::sleep_for(chrono::milliseconds(1500));
+		return;
 	}
+	//	Если некого не нашел в радиусе ИДЕТ К СТЕНЕ
 	else
 	{
-		//	ИДЕТ К СТЕНКЕ
+		//	ХОДИТ ПО ПОЛЮ
 		if (map[(y * mapSizeHorizontal) + x] != L'#')
 		{
-			mciSendString(L"play sounds/moveWall.wav", NULL, SND_ASYNC, NULL);
+			//	Поля для того что бы найти ближайшую стенку
+			int up = 0;
+			int down = 0;
+			int left = 0;
+			int right = 0;
+			int command = 0;
 
-			//y += 1;
-			y -= 1;
-			//x += 1;
-			//x -= 1;
+			//	RIGTH
+			for (int i = x; i < mapSizeHorizontal; i++)
+				if (map[y * mapSizeHorizontal + i] != L'#') right += 1;
+				else break;
+			//	LEFT
+			for (int i = x; i > 0; i--)
+				if (map[y * mapSizeHorizontal + i] != L'#') left += 1;
+				else break;
+			//	DOWN
+			for (int i = y; i > 0; i--)
+				if (map[i * mapSizeHorizontal + x] != L'#') down += 1;
+				else break;
+			//	UP
+			for (int i = y; i < mapSizeVertical; i++)
+				if (map[i * mapSizeHorizontal + x] != L'#') up += 1;
+				else break;
+
+
+			if (right < left
+				&& right < up
+				&& right < down) {
+				command = 1;
+			}
+
+			else if (left < right
+				&& left < up
+				&& left < down) {
+				command = 2;
+			}
+
+			else if (down < right
+				&& down < up
+				&& down < left) {
+				command = 3;
+			}
+
+			else if (up < right
+				&& up < down
+				&& up < left) {
+				command = 4;
+			}
+			else { command = 4; }
+			//	Идет к ближайшей стенке
+			switch (command)
+			{
+
+			case 1://	RIGTH
+				if (map[y * mapSizeHorizontal + x] != L'#') { x += 1; }
+				break;
+
+			case 2://	LEFT
+				if (map[y * mapSizeHorizontal + x] != L'#') { x -= 1; }
+				break;
+
+			case 3://	DOWN
+				if (map[y * mapSizeHorizontal + x] != L'#') { y -= 1; }
+				break;
+
+			case 4://	UP
+				if (map[y * mapSizeHorizontal + x] != L'#') { y += 1; }
+
+				break;
+			}
+
 			this_thread::sleep_for(chrono::milliseconds(1500));
+			return;
 		}
 		//	ХОДИТ ПО СТЕНКЕ
 		else
 		{
-			//mciSendString(L"play sounds/moveWall.wav", NULL, SND_ASYNC, NULL);
-			switch (rand() % 4 + 1)
-			{
+			switch (rand() % 4 + 1) {
 			case 1:
-				if (map[(y + 1) * mapSizeHorizontal + x] == L'#' && (y + 1) < mapSizeVertical)
-				{
+				if ((y + 1) < mapSizeVertical && map[(y + 1) * mapSizeHorizontal + x] == L'#') {
 					y += 1;
-				}break;
+				}
+				else if ((y + 2) < mapSizeVertical && map[(y + 2) * mapSizeHorizontal + x] == L'#') {
+					y += 2;
+				}
+				break;
 			case 2:
-				if (map[(y - 1) * mapSizeHorizontal + x] == L'#' && (y - 1) > mapSizeVertical)
-				{
+				if ((y - 1) >= 0 && map[(y - 1) * mapSizeHorizontal + x] == L'#') {
 					y -= 1;
-				}break;
+				}
+				else if ((y - 2) >= 0 && map[(y - 2) * mapSizeHorizontal + x] == L'#') {
+					y -= 2;
+				}
+				break;
 			case 3:
-				if (map[y * mapSizeHorizontal + (x + 1)] == L'#' && (x + 1) < mapSizeHorizontal)
-				{
+				if ((x + 1) < mapSizeHorizontal && map[y * mapSizeHorizontal + (x + 1)] == L'#') {
 					x += 1;
-				}break;
+				}
+				else if ((x + 2) < mapSizeHorizontal && map[y * mapSizeHorizontal + (x + 2)] == L'#') {
+					x += 2;
+				}
+				break;
 			case 4:
-				if (map[y * mapSizeHorizontal + (x - 1)] == L'#' && (x - 1) > mapSizeHorizontal)
-				{
+				if ((x - 1) >= 0 && map[y * mapSizeHorizontal + (x - 1)] == L'#') {
 					x -= 1;
-				}break;
-				this_thread::sleep_for(chrono::milliseconds(200));
+				}
+				else if ((x - 2) >= 0 && map[y * mapSizeHorizontal + (x - 2)] == L'#') {
+					x -= 2;
+				}
+				break;
 			}
+
+			this_thread::sleep_for(chrono::milliseconds(50));
+			return;
 		}
 	}
 }
