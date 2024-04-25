@@ -1,6 +1,10 @@
-C:\Users\zahar\OneDrive\Рабочий стол\horor_on_console_engine-dev\Engine\Engine.cpp;C:\Users\zahar\OneDrive\Рабочий стол\horor_on_console_engine-dev\Engine\x64\Debug\Engine.obj
-C:\Users\zahar\OneDrive\Рабочий стол\horor_on_console_engine-dev\Engine\Monster.cpp;C:\Users\zahar\OneDrive\Рабочий стол\horor_on_console_engine-dev\Engine\x64\Debug\Monster.obj
-C:\Users\zahar\OneDrive\Рабочий стол\horor_on_console_engine-dev\Engine\main.cpp;C:\Users\zahar\OneDrive\Рабочий стол\horor_on_console_engine-dev\Engine\x64\Debug\main.obj
-C:\Users\zahar\OneDrive\Рабочий стол\horor_on_console_engine-dev\Engine\MapInfo.cpp;C:\Users\zahar\OneDrive\Рабочий стол\horor_on_console_engine-dev\Engine\x64\Debug\MapInfo.obj
-C:\Users\zahar\OneDrive\Рабочий стол\horor_on_console_engine-dev\Engine\Player.cpp;C:\Users\zahar\OneDrive\Рабочий стол\horor_on_console_engine-dev\Engine\x64\Debug\Player.obj
-C:\Users\zahar\OneDrive\Рабочий стол\horor_on_console_engine-dev\Engine\Screensavers.cpp;C:\Users\zahar\OneDrive\Рабочий стол\horor_on_console_engine-dev\Engine\x64\Debug\Screensavers.obj
+D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Engine.cpp;D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\x64\Debug\Engine.obj
+D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Monster.cpp;D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\x64\Debug\Monster.obj
+D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\main.cpp;D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\x64\Debug\main.obj
+D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Map.cpp;D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\x64\Debug\Map.obj
+D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Player.cpp;D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\x64\Debug\Player.obj
+D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\RestoringEnergy.cpp;D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\x64\Debug\RestoringEnergy.obj
+D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\RestoringHealth.cpp;D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\x64\Debug\RestoringHealth.obj
+D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Screensavers.cpp;D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\x64\Debug\Screensavers.obj
+D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Teleport.cpp;D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\x64\Debug\Teleport.obj
+D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\test.cpp;D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\x64\Debug\test.obj
