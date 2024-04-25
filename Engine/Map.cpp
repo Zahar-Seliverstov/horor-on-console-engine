@@ -265,35 +265,37 @@ void MapInfo::createmap()
 	mapPlayerSaw = new bool[mapSizeHorizontal * mapSizeVertical];
 	for (int x = 0; x < mapSizeHorizontal; x++) {
 		for (int y = 0; y < mapSizeVertical; y++) {
-			mapPlayerSaw[y * x] = false;
+			mapPlayerSaw[y * x] = true;
 		}
 	}
-	//	Устанавливаем стартовую позицию игрока на карте 
-	setPlayerStartingCoordinates();
 
-	//	Устанавливаем кпозицию телепорта на карте
-	setTeleportCoordinates();
+	setPositionObject(20);
+	////	Устанавливаем стартовую позицию игрока на карте 
+	//setPlayerStartingCoordinates();
 
-	//	Телепорт
-	map[teleportInfo->getY() * mapSizeHorizontal + teleportInfo->getX()] = teleportInfo->getMapSkin();
+	////	Устанавливаем кпозицию телепорта на карте
+	//setTeleportCoordinates();
 
-	//	ТЕСТ спаун ИГРОКА у телепорта
-	playerInfo->setPositionX(teleportInfo->getX() + 2);
-	playerInfo->setPositionY(teleportInfo->getY() + 2);
+	////	Телепорт
+	//map[teleportInfo->getY() * mapSizeHorizontal + teleportInfo->getX()] = teleportInfo->getMapSkin();
 
-	//	ТЕСТ спаун ХИЛКИ у телепорта
-	restoringHealthInfo->setX(teleportInfo->getX() + 1);
-	restoringHealthInfo->setY(teleportInfo->getY() + 1);
-	map[restoringHealthInfo->getY() * mapSizeHorizontal + restoringHealthInfo->getX()] = restoringHealthInfo->getMapSkin();
+	////	ТЕСТ спаун ИГРОКА у телепорта
+	//playerInfo->setPositionX(teleportInfo->getX() + 2);
+	//playerInfo->setPositionY(teleportInfo->getY() + 2);
 
-	//	ТЕСТ спаун СТАМИНЫ у телепорта
-	restoryngEnergyInfo->setX(teleportInfo->getX() - 2);
-	restoryngEnergyInfo->setY(teleportInfo->getY() - 2);
-	map[restoryngEnergyInfo->getY() * mapSizeHorizontal + restoryngEnergyInfo->getX()] = restoryngEnergyInfo->getMapSkin();
+	////	ТЕСТ спаун ХИЛКИ у телепорта
+	//restoringHealthInfo->setX(teleportInfo->getX() + 1);
+	//restoringHealthInfo->setY(teleportInfo->getY() + 1);
+	//map[restoringHealthInfo->getY() * mapSizeHorizontal + restoringHealthInfo->getX()] = restoringHealthInfo->getMapSkin();
 
-	//	ТЕСТ спаун МОНСТРА у телепорта
-	monsterInfo->setX(teleportInfo->getX() - 1);
-	monsterInfo->setY(teleportInfo->getY() - 1);
+	////	ТЕСТ спаун СТАМИНЫ у телепорта
+	//restoryngEnergyInfo->setX(teleportInfo->getX() - 2);
+	//restoryngEnergyInfo->setY(teleportInfo->getY() - 2);
+	//map[restoryngEnergyInfo->getY() * mapSizeHorizontal + restoryngEnergyInfo->getX()] = restoryngEnergyInfo->getMapSkin();
+
+	////	ТЕСТ спаун МОНСТРА у телепорта
+	//monsterInfo->setX(teleportInfo->getX() - 1);
+	//monsterInfo->setY(teleportInfo->getY() - 1);
 
 
 	//	СТРОГО ЗДЕСЬ

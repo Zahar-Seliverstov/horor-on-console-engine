@@ -504,7 +504,7 @@ bool Engine::mapViewBoundaryCheck(int x, int y)
 {
 	if (displayMap && ((x < mapInfo->mapSizeHorizontal) && y > 2 && (y < mapInfo->mapSizeVertical + 3) && y < screenHeight - 3))
 	{
-		if (mapInfo->mapPlayerSaw[((y - 3) * (mapInfo->mapSizeHorizontal)) + x] == true)	// ПРиколЛ
+		if (mapInfo->mapPlayerSaw[((y - 3) * (mapInfo->mapSizeHorizontal)) + x] /*== true*/)	// ПРиколЛ
 			return false;
 		else
 			return true;

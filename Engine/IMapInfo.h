@@ -62,5 +62,62 @@ public:
 	void setTeleportCoordinates();
 	//	Создание карты
 	void createmap();
+	// Генерация позиции объкта на карте
+	template <typename T>
+	void setPositionObject(T minDistance = 1) {
+		srand(time(nullptr));
+		size_t count = 5;
+		vector<COORD> objPosition;
+
+		for (size_t c = 0; c < count; ++c) {
+			srand(rand());
+			bool validLocation = false;
+
+			while (!validLocation) {
+				int objectX = rand() % (mapSizeHorizontal - 2) + 1;
+				int objectY = rand() % (mapSizeVertical - 2) + 1;
+
+				if (maze[objectY][objectX] == 0 || maze[objectY][objectX] == 2) {
+					bool tooClose = false;
+
+					for (const auto& pos : objPosition) {
+						// Проверяем расстояние между новой позицией и уже существующими
+						if (std::sqrt(std::pow(objectX - pos.X, 2) + std::pow(objectY - pos.Y, 2)) < minDistance) {
+							tooClose = true;
+							break;
+						}
+					}
+
+					if (!tooClose) {
+						validLocation = true;
+						COORD cord;
+						cord.Y = objectY;
+						cord.X = objectX;
+						objPosition.push_back(cord);
+					}
+				}
+			}
+		}
+
+		playerInfo->setPositionX(objPosition[0].X);
+		playerInfo->setPositionY(objPosition[0].Y);
+
+		monsterInfo->setX(objPosition[1].X);
+		monsterInfo->setY(objPosition[1].Y);
+
+		restoringHealthInfo->setX(objPosition[2].X);
+		restoringHealthInfo->setY(objPosition[2].Y);
+		map[restoringHealthInfo->getY() * mapSizeHorizontal + restoringHealthInfo->getX()] = restoringHealthInfo->getMapSkin();
+
+
+		restoryngEnergyInfo->setX(objPosition[3].X);
+		restoryngEnergyInfo->setY(objPosition[3].Y);
+		map[restoryngEnergyInfo->getY() * mapSizeHorizontal + restoryngEnergyInfo->getX()] = restoryngEnergyInfo->getMapSkin();
+
+
+		teleportInfo->setX(objPosition[4].X);
+		teleportInfo->setY(objPosition[4].Y);
+	}
+
 
 };

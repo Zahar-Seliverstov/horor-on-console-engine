@@ -5,27 +5,4 @@ D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Engine.
 D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Engine.cpp(529,23): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
 D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Engine.cpp(530,23): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
 D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Engine.cpp(600,42): warning C4244: =: преобразование "float" в "int", возможна потеря данных
-  Monster.cpp
-  main.cpp
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\main.cpp(82,12): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
-  Map.cpp
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Map.cpp(211,55): warning C4244: аргумент: преобразование "double" в "const unsigned __int64", возможна потеря данных
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Map.cpp(240,12): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
-  Player.cpp
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Player.cpp(32,13): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Player.cpp(33,13): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Player.cpp(35,14): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Player.cpp(36,14): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Player.cpp(42,13): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Player.cpp(43,13): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Player.cpp(45,14): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Player.cpp(46,14): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
-  RestoringEnergy.cpp
-  RestoringHealth.cpp
-  Screensavers.cpp
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Screensavers.cpp(120,35): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
-D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\Engine\Screensavers.cpp(121,37): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
-  Teleport.cpp
-  test.cpp
-  Создание кода...
   Engine.vcxproj -> D:\Ustinov\Projects_Code\VisualStudio\CPP\horor_on_console_engine\x64\Debug\Engine.exe
