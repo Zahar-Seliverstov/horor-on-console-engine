@@ -30,6 +30,7 @@ void MapInfo::createDungeon()
 		}
 	}
 }
+
 //	Рекурсивный метод для разделения пространства
 void MapInfo::division(int startX, int endX, int startY, int endY)
 {
@@ -67,6 +68,7 @@ void MapInfo::division(int startX, int endX, int startY, int endY)
 		}
 	}
 }
+
 //	Метод для создания комнаты
 void MapInfo::createRoom(bool isHorizontal, int startX, int endX, int startY, int endY)
 {
@@ -142,6 +144,7 @@ void MapInfo::createRoom(bool isHorizontal, int startX, int endX, int startY, in
 		division(startX, endX, horizontalWall + 1, endY);
 	}
 }
+
 //	Метод для создания границ для карты
 void MapInfo::createBorders()
 {
@@ -157,8 +160,10 @@ void MapInfo::createBorders()
 		maze[i][mapSizeHorizontal - 1] = 1;  // Правая граница
 	}
 }
+
 //	Метод для отчищения карты
 void MapInfo::clearmap() { map = initialMap; }
+
 //	Метод для вывода карты подземелья в консоль
 void MapInfo::printDungeon()
 {
@@ -178,8 +183,10 @@ void MapInfo::printDungeon()
 		cout << endl;
 	}
 }
+
 //	Метод для получения maze
 vector<vector<int>> MapInfo::getIntMaze() { return maze; }
+
 //	Метод для перевода из масива в wstring
 wstring MapInfo::getWstringMaze()
 {
@@ -200,6 +207,7 @@ wstring MapInfo::getWstringMaze()
 	}
 	return mazeString;
 }
+
 //	Стартовые координаты игрока
 void MapInfo::setPlayerStartingCoordinates()
 {
@@ -215,6 +223,7 @@ void MapInfo::setPlayerStartingCoordinates()
 			return;
 	}
 }
+
 //  Координаты телепорта
 void MapInfo::setTeleportCoordinates()
 {
@@ -241,20 +250,67 @@ void MapInfo::setTeleportCoordinates()
 	teleportInfo->setX(rand() % (mapSizeHorizontal - 2) + 1);
 	teleportInfo->setY(rand() % (mapSizeVertical - 2) + 1);
 }
-//// Финишные координаты телепорта
-//void MapInfo::setteleportСoordinates()
-//{
-//	while (true)
-//	{
-//		teleportСoordinates.first = rand() % (mapSizeHorizontal - 2) + 1;
-//		teleportСoordinates.second = rand() % (mapSizeVertical - 2) + 1;
-//		if (map[teleportСoordinates.second * mapSizeHorizontal + teleportСoordinates.first] != '#'
-//			&& abs(teleportСoordinates.first - playerStartingCoordinates.first) > mapSizeHorizontal * 0.6
-//			&& abs(teleportСoordinates.second - playerStartingCoordinates.second) > mapSizeVertical * 0.6)
-//			return;
-//	}
-//}
-// 
+
+//	Задает координаты обьектам
+void MapInfo::setPositionObject(int minDistance = 1) {
+	srand(time(nullptr));
+	size_t count = 5;//	Сколько обьектов будет обрабатыватся
+	vector<COORD> objPosition;//	Место под координаты
+	
+	//	Генерируем расположение обьектов
+	for (size_t c = 0; c < count; ++c) {
+		srand(rand());
+		bool validLocation = false;
+
+		while (!validLocation) {
+			int objectX = rand() % (mapSizeHorizontal - 2) + 1;
+			int objectY = rand() % (mapSizeVertical - 2) + 1;
+
+			if (maze[objectY][objectX] == 0 || maze[objectY][objectX] == 2) {
+				bool tooClose = false;
+
+				for (const auto& pos : objPosition) {
+					// Проверяем расстояние между новой позицией и уже существующими
+					if (std::sqrt(std::pow(objectX - pos.X, 2) + std::pow(objectY - pos.Y, 2)) < minDistance) {
+						tooClose = true;
+						break;
+					}
+				}
+
+				if (!tooClose) {
+					validLocation = true;
+					COORD cord;
+					cord.Y = objectY;
+					cord.X = objectX;
+					objPosition.push_back(cord);
+				}
+			}
+		}
+	}
+
+	//	Устанавливаем стартовую позицию игрока на карте 
+	playerInfo->setPositionX(objPosition[0].X);
+	playerInfo->setPositionY(objPosition[0].Y);
+
+	//	Задаем иначальные координаты МОНСТРА
+	monsterInfo->setX(objPosition[1].X);
+	monsterInfo->setY(objPosition[1].Y);
+
+	//	Задаем иначальные координаты ХИЛКУ
+	restoringHealthInfo->setX(objPosition[2].X);
+	restoringHealthInfo->setY(objPosition[2].Y);
+	map[restoringHealthInfo->getY() * mapSizeHorizontal + restoringHealthInfo->getX()] = restoringHealthInfo->getMapSkin();
+
+	//	Задаем иначальные координаты СТАМИНУ
+	restoryngEnergyInfo->setX(objPosition[3].X);
+	restoryngEnergyInfo->setY(objPosition[3].Y);
+	map[restoryngEnergyInfo->getY() * mapSizeHorizontal + restoryngEnergyInfo->getX()] = restoryngEnergyInfo->getMapSkin();
+
+	//	Задаем иначальные координаты ТЕЛЕПОРТА
+	teleportInfo->setX(objPosition[4].X);
+	teleportInfo->setY(objPosition[4].Y);
+	map[teleportInfo->getY() * mapSizeHorizontal + teleportInfo->getX()] = teleportInfo->getMapSkin();
+}
 
 // Создание карты
 void MapInfo::createmap()
@@ -262,23 +318,6 @@ void MapInfo::createmap()
 	createDungeon();
 	createBorders();
 	map = getWstringMaze();	//	Полуаем карту 
-	/*map += L"##############";
-	map += L"#            #";
-	map += L"#            #";
-	map += L"#            #";
-	map += L"#            #";
-	map += L"#            #";
-	map += L"#            #";
-	map += L"#            #";
-	map += L"#            #";
-	map += L"#            #";
-	map += L"#            #";
-	map += L"#            #";
-	map += L"#            #";
-	map += L"##############";
-
-	mapSizeHorizontal = 14;
-	mapSizeVertical = 14;*/
 
 	mapPlayerSaw = new bool[mapSizeHorizontal * mapSizeVertical];	//	Массив того что видел игрок
 
@@ -287,33 +326,8 @@ void MapInfo::createmap()
 		for (int y = 0; y < mapSizeVertical; y++)
 			mapPlayerSaw[y * x] = true;
 
-	setPositionObject(20);	//	Распологаем обьекты на карте
-	////	Устанавливаем стартовую позицию игрока на карте 
-	//setPlayerStartingCoordinates();
-
-	////	Устанавливаем кпозицию телепорта на карте
-	//setTeleportCoordinates();
-
-	////	Телепорт
-	//map[teleportInfo->getY() * mapSizeHorizontal + teleportInfo->getX()] = teleportInfo->getMapSkin();
-
-	////	ТЕСТ спаун ИГРОКА у телепорта
-	//playerInfo->setPositionX(teleportInfo->getX() + 2);
-	//playerInfo->setPositionY(teleportInfo->getY() + 2);
-
-	////	ТЕСТ спаун ХИЛКИ у телепорта
-	//restoringHealthInfo->setX(teleportInfo->getX() + 1);
-	//restoringHealthInfo->setY(teleportInfo->getY() + 1);
-	//map[restoringHealthInfo->getY() * mapSizeHorizontal + restoringHealthInfo->getX()] = restoringHealthInfo->getMapSkin();
-
-	////	ТЕСТ спаун СТАМИНЫ у телепорта
-	//restoryngEnergyInfo->setX(teleportInfo->getX() - 2);
-	//restoryngEnergyInfo->setY(teleportInfo->getY() - 2);
-	//map[restoryngEnergyInfo->getY() * mapSizeHorizontal + restoryngEnergyInfo->getX()] = restoryngEnergyInfo->getMapSkin();
-
-	////	ТЕСТ спаун МОНСТРА у телепорта
-	//monsterInfo->setX(teleportInfo->getX() - 1);
-	//monsterInfo->setY(teleportInfo->getY() - 1);
+	//	Распологаем обьекты на карте
+	setPositionObject(20);	
 
 	//	СТРОГО ЗДЕСЬ
 	initialMap = map;

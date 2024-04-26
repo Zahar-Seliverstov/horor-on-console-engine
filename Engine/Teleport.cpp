@@ -10,15 +10,7 @@ Teleport::Teleport() {
 	frontSkin = L'\x2666';
 	mapSkin = L'T';
 }
-//Teleport::Teleport(int x, int y, int attributeEdge, int attributeFrontColor, wchar_t edgeSkin, wchar_t frontSkin, wchar_t mapSkin) {
-//	this->x = x;
-//	this->y = y;
-//	this->attributeEdge = attributeEdge;
-//	this->attributeFrontColor = attributeFrontColor;
-//	this->edgeSkin = edgeSkin;
-//	this->frontSkin = frontSkin;
-//	this->mapSkin = mapSkin;
-//}
+
 // get
 int Teleport::getX() { return  x; }
 int Teleport::getY() { return y; }

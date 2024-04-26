@@ -75,8 +75,7 @@ void PrintGameTitle(int& screenWidth, int& screenHeight)
 		cout << "\t" << nameGame[i] << endl;
 	}
 	this_thread::sleep_for(chrono::milliseconds(3100));
-	//playMenuSound.detach();
-	//system("pause");
+	system("cls");
 }
 void DownloadScreensaver(int& screenWidth, int& screenHeight)
 {

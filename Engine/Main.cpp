@@ -8,6 +8,8 @@
 #include "IRestoringHealth.h"
 #include "IRestoringEnergy.h"
 
+
+//	Создаем обькты для работы с ними далее
 Player playerInfo;
 RestoringEnergy restoringEnergyInfo;
 RestoringHealth restoringHealthInfo;
@@ -27,20 +29,16 @@ Engine engineInfo(
 	restoringEnergyInfo,
 	mapInfo);
 
-void generateInitialFloor()
-{
-	mapInfo.createmap();
-	initialScreensaver();
-
-	//playerInfo.setPositionX(teleportInfo.getX() + 1);
-	//playerInfo.setPositionX(teleportInfo.getY() + 1);
-
-	engineInfo.getConsoleSize();
-	engineInfo.setScreenSize();
-
-	engineInfo.setCursoreVisible();
-	//PrintGameTitle(engine.screenWidth, engine.screenHeight);
-	engineInfo.start();
+//	Генерируем начальный этаж
+void generateInitialFloor() {
+	mapInfo.createmap();					//	Создаем карту
+	engineInfo.getConsoleSize();			//	Получаем размер консоли
+	PrintGameTitle(engineInfo.screenWidth, engineInfo.screenHeight);	//	Экран игры
+	initialScreensaver();					//	Экран выбора
+	engineInfo.getConsoleSize();			//	Получаем размер консоли	
+	engineInfo.setScreenSize();				//	Устанавливаем размер массива который выступает экраном
+	engineInfo.setCursoreVisible();			//	Делаем курсор не видимым
+	engineInfo.start();						//	Запускаем движок
 }
 void generateNextFloor()
 {
@@ -76,18 +74,13 @@ int main()
 	SetCurrentConsoleFontEx(hConsole, FALSE, &fontInfo);
 
 	setlocale(LC_ALL, "rus");
-	//system("chcp 65001");
-	system("chcp 1251");
-
+	system("chcp 65001");
+	//system("chcp 1251");
 	srand(time(NULL));
-	/*UINT codePage = GetConsoleOutputCP();
-	std::cout << codePage;*/
 
 	//	Запускаем цикл генерации и перемещения по этажам
 	for (int numberFloor = 1; numberFloor <= maxCountFloor; numberFloor++)
 		numberFloor == 1 ? generateInitialFloor() : generateNextFloor();
-	/*generateInitialFloor();
-	generateNextFloor();*/
 
 	return 0;
 }

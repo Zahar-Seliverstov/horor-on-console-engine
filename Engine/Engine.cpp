@@ -508,7 +508,7 @@ bool Engine::mapViewBoundaryCheck(int x, int y)
 {
 	if (displayMap && ((x < mapInfo->mapSizeHorizontal) && y > 2 && (y < mapInfo->mapSizeVertical + 3) && y < screenHeight - 3))
 	{
-		if (mapInfo->mapPlayerSaw[((y - 3) * (mapInfo->mapSizeHorizontal)) + x] /*== true*/)	// ПРиколЛ
+		if (mapInfo->mapPlayerSaw[((y - 3) * (mapInfo->mapSizeHorizontal)) + x]/* == true*/)	// ПРиколЛ
 			return false;
 		else
 			return true;
@@ -518,15 +518,13 @@ bool Engine::mapViewBoundaryCheck(int x, int y)
 }
 
 //	Генерирует кадр
-void Engine::generateFrame()
-{
-	if (!settingsIsOpen && !playerMovedToNextFloor)
-	{
-		//	Отчищаем карту от угла обзора игрока
-		mapInfo->clearmap();
-		//mapInfo->map[monsterInfo->getY() * mapInfo->mapSizeHorizontal + monsterInfo->getX()] = monsterInfo->getMapSkin();
+void Engine::generateFrame() {
+	if (!settingsIsOpen && !playerMovedToNextFloor) {
+		mapInfo->clearmap();//	Отчищаем карту от угла обзора игрока
 		frameIsBuild = true;	//	Генерация кадра началась
+
 		for (int x = 0; x < screenWidth; x++) {
+			//	Переменные для работы движка
 			int testX;
 			int testY;
 			double rayAngle = playerInfo->getPositionR() + fov / 2.0f - x * fov / screenWidth;
@@ -542,6 +540,7 @@ void Engine::generateFrame()
 			bool itMonster = false;
 			bool itBound = false;
 
+			//	Пока луч не встретится с одним из обьектов
 			while (!itWall
 				&& !itTeleport
 				&& !itRestoringEnergy
@@ -552,17 +551,22 @@ void Engine::generateFrame()
 				distanceWall += texturingLevel;
 				testX = (int)(playerInfo->getPositionX() + rayX * distanceWall);
 				testY = (int)(playerInfo->getPositionY() + rayY * distanceWall);
+
 				//	Проверяем что луч стлкнулся с МОНСТРОМ
-				//if (mapInfo->map[testY * mapInfo->mapSizeHorizontal + testX] == L'M') { itMonster = true; }
 				if (testY == monsterInfo->getY() && testX == monsterInfo->getX()) { itMonster = true; }
+
 				//	Проверяем что луч столкнулся с ХИЛКОЙ 
 				else if (mapInfo->map[testY * mapInfo->mapSizeHorizontal + testX] == L'H') { itRestoringHealth = true; }
+
 				//	Проверяем что луч столкнулся с ТЕЛЕПОРТОМ
 				else if (mapInfo->map[testY * mapInfo->mapSizeHorizontal + testX] == L'T') { itTeleport = true; }
+
 				//	Проверяем что луч столкнулся со СТАМИНОЙ
 				else if (mapInfo->map[testY * mapInfo->mapSizeHorizontal + testX] == L'E') { itRestoringEnergy = true; }
+
 				//	Проверяем что луч столкнулся со СТЕНКОЙ
 				else if (mapInfo->map[testY * mapInfo->mapSizeHorizontal + testX] == L'#') { itWall = true; }
+
 				//	Отрисовываем на карте угол обзора
 				if (!itWall
 					&& !itTeleport
@@ -604,6 +608,7 @@ void Engine::generateFrame()
 			celling = (float)(screenHeight / 2.0) - screenHeight / ((float)distanceWall);	//	Высчитываем потолок
 			floor = screenHeight - celling;													//	Высчитываем пол
 
+			//	Заполнение экрана
 			for (int y = 0; y < screenHeight; y++) {
 				int gg = 1;
 				double centerScreen = 1 - double(y - screenHeight / 2) / (screenHeight / 2);	//	Высчитываем цент экрана
@@ -649,8 +654,8 @@ void Engine::generateFrame()
 								if (distanceWall <= drawingRange / 5) { wallTexture = L'█'; }
 								else if (distanceWall <= drawingRange / 4) { wallTexture = L'▓'; }
 								else if (distanceWall <= drawingRange / 2.3) { wallTexture = L'▒'; }
-								else if (distanceWall <= drawingRange) { wallTexture = L'░'; }
-								//else { wallTexture = L' '; }
+								else if (distanceWall < drawingRange) { wallTexture = L'░'; }
+								else { wallTexture = L' '; }
 								screen[y * screenWidth + x].Attributes = 8;
 							}
 							screen[y * screenWidth + x].Char.UnicodeChar = wallTexture;
@@ -695,9 +700,9 @@ void Engine::generateFrame()
 
 						if (centerScreen < 0.2f)
 							floorTexture = '&';
-						else if (centerScreen < 0.3f)
+						else if (centerScreen < 0.4f)
 							floorTexture = '#';
-						else if (centerScreen < 0.5f)
+						else if (centerScreen < 0.6f)
 							floorTexture = '*';
 						else if (centerScreen < 0.9f)
 							floorTexture = ':';
@@ -746,7 +751,7 @@ void Engine::start()
 				mciSendString(L"play sounds/die.wav wait", NULL, 0, NULL);
 			}
 
-		}});
+		}});			//	Движение монстра
 	thread playPlayerMovementSound([&]()
 		{
 			while (!gameIsOver && !playerMovedToNextFloor)
@@ -868,13 +873,9 @@ void Engine::start()
 		});	//	Генерация кадра
 
 	while (true) {}
-	//std:cout << "gfgfgfg";
-	//PlaySound(nullptr, NULL, 0);
-	//	НЕРАБОТАЕТ ПРЕРЫВАНИЕ ЗВУКА
-	//mciSendString((L"close " + randomSound).c_str(), nullptr, 0, nullptr);
-	system("cls");
 
 	//	Завершение открытых потоков
+	monsterMovement.join();
 	checkStatusKeyInfo.join();
 	checkEnergyInfo.join();
 	playPlayerMovementSound.join();

@@ -55,8 +55,6 @@ void Monster::setMapSkin(wchar_t newMapSkin) { mapSkin = newMapSkin; }
 
 //	Удар
 int Monster::hitPlayer(int playerHp) {
-	//PlaySound(L"sounds/hitPlayer.wav", NULL, SND_ASYNC);
-
 	return (playerHp - damage < 0 ? 0 : (playerHp - damage));
 }
 
@@ -72,10 +70,6 @@ void Monster::movement(
 	//	Получаем и округляем в БОЛЬШУЮ часть координаты игрока
 	int playerX = round(playerPositionX);
 	int playerY = round(playerPositionY);
-
-	//int coordinateDifference = abs((x + y) - (playerX + playerY));
-
-
 
 	//	Вычисляем разницу между координатами игрока и монстра
 	int coordinateDifferenceX = abs(x - playerX);
@@ -146,7 +140,6 @@ void Monster::movement(
 				if (map[i * mapSizeHorizontal + x] != L'#') up += 1;
 				else break;
 
-
 			if (right < left
 				&& right < up
 				&& right < down) {
@@ -171,6 +164,7 @@ void Monster::movement(
 				command = 4;
 			}
 			else { command = 4; }
+
 			//	Идет к ближайшей стенке
 			switch (command)
 			{
