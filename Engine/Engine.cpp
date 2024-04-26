@@ -29,7 +29,7 @@ Engine::Engine(
 	startFrameGeneration = chrono::high_resolution_clock::now();
 	endFrameGeneration = chrono::high_resolution_clock::now();
 	console = GetStdHandle(STD_OUTPUT_HANDLE);
-	drawingRange = 10;
+	drawingRange = 7;
 	fov = 3.14159f / 1.5f;
 	texturingLevel = 0.1f;
 	playerMovedToNextFloor = false;
@@ -770,13 +770,12 @@ void Engine::start()
 				}
 			}
 		});	//	Звуки ходьбы
+
 	thread playGameSounds([&]()
 		{
-
-			while (!gameIsOver && !playerMovedToNextFloor)
-			{
-				vector<wstring> listAllSounds
-				{
+			while (!gameIsOver && !playerMovedToNextFloor) {
+				srand(time(NULL));
+				vector<wstring> listAllSounds{
 					L"sounds/gameSound1.wav",
 					L"sounds/gameSound2.wav",
 					L"sounds/gameSound3.wav",
@@ -784,7 +783,6 @@ void Engine::start()
 				};
 				wstring randomSound;
 				randomSound = listAllSounds[rand() % listAllSounds.size()];
-				//mciSendString((L"play " + randomSound).c_str(), NULL, 0, 0);
 				mciSendString((L"play " + randomSound).c_str(), NULL, 0, 0);
 			}
 		});			//	Звуки задеого фона игры
@@ -833,7 +831,7 @@ void Engine::start()
 					//	Чекаем игрок в телепорте или нет 
 					checkPlayerUseObject();
 					//	Проигрываем звуки при нажатии на спец клавиши ( ESCAPE, F, M )
-					switch (_getch())
+					switch (_getwch())
 					{
 					case 109:
 						mciSendString(L"play sounds/buttonsInfo.wav", NULL, SND_ASYNC, 0);
@@ -872,8 +870,7 @@ void Engine::start()
 		}
 		});	//	Генерация кадра
 
-	while (true) {}
-
+	while (!playerMovedToNextFloor) {}
 	//	Завершение открытых потоков
 	monsterMovement.join();
 	checkStatusKeyInfo.join();
@@ -881,6 +878,7 @@ void Engine::start()
 	playPlayerMovementSound.join();
 	playGameSounds.join();
 	generateAndDisplayFrame.join();
+	//system("cls");
 	return;
 
 }

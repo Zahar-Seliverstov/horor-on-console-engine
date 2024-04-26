@@ -1,3 +1,9 @@
-﻿  main.cpp
-C:\Users\Seliv_zh92\Desktop\project\horor_on_console_engine\Engine\main.cpp(79,12): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+﻿  Engine.cpp
+C:\Users\Seliv_zh92\Desktop\project\horor_on_console_engine\Engine\Engine.cpp(144,39): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Seliv_zh92\Desktop\project\horor_on_console_engine\Engine\Engine.cpp(401,13): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Seliv_zh92\Desktop\project\horor_on_console_engine\Engine\Engine.cpp(406,102): warning C4244: +=: преобразование "double" в "int", возможна потеря данных
+C:\Users\Seliv_zh92\Desktop\project\horor_on_console_engine\Engine\Engine.cpp(531,23): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\Users\Seliv_zh92\Desktop\project\horor_on_console_engine\Engine\Engine.cpp(532,23): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\Users\Seliv_zh92\Desktop\project\horor_on_console_engine\Engine\Engine.cpp(608,42): warning C4244: =: преобразование "float" в "int", возможна потеря данных
+C:\Users\Seliv_zh92\Desktop\project\horor_on_console_engine\Engine\Engine.cpp(777,15): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
   Engine.vcxproj -> C:\Users\Seliv_zh92\Desktop\project\horor_on_console_engine\x64\Debug\Engine.exe
